@@ -40,15 +40,15 @@ class MainProgram:
         print("Please select an option:")
         print("1. manage keys")
         print("2. exit")
-        option = input("Enter option: ")
-        clear_screen()
-        if option == "1":
-            self.manage_keys()
-        elif option == "2":
-            print("not yet ready")
-        else:
-            print("Invalid option")
-            self.main_menu()
+        # option = input("Enter option: ")
+        # clear_screen()
+        # if option == "1":
+        #     self.manage_keys()
+        # elif option == "2":
+        #     print("not yet ready")
+        # else:
+        #     print("Invalid option")
+        #     self.main_menu()
 
     def main(self):
         self.main_menu()
