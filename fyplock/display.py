@@ -36,7 +36,7 @@ class Display:
             self.draw.rectangle((0, 0, self.oled.width, self.oled.height), outline=0, fill=0)
             doorLockStatusString = self.doorLock.getStatusString()
             for i in range(len(doorLockStatusString)):
-                self.draw.text((0, 16*i), str(doorLockStatusString[i], 'utf-8'), font=self.font, fill=255)
+                self.draw.text((0, 16*i), doorLockStatusString[i], font=self.font, fill=255)
             self.oled.image(self.image)
             self.oled.show()
             time.sleep(self.LOOPTIME)
