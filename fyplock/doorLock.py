@@ -43,10 +43,12 @@ class DoorLock:
         pass
 
     def detect_android_nfc_key(self):
+        print("detecting android nfc key...")
         while True:
             self.pn532.listen_for_passive_target()
             uid = self.pn532.get_passive_target()
             if uid is None:
+                print("card not found")
                 continue
             print("Found card with UID:", [hex(i) for i in uid])
 
