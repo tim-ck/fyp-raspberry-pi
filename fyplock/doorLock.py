@@ -26,7 +26,7 @@ class DoorLock:
         self.pn532.SAM_configuration()
         # new thread to detect nfc card
         print("Starting NFC card detection thread...")
-        self.nfc_thread = threading.Thread(target=self.detectKeyCard)
+        self.nfc_thread = threading.Thread(target=self.detect_android_nfc_key)
         self.nfc_thread.start()
 
     def lock(self):
