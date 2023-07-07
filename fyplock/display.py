@@ -32,7 +32,13 @@ class Display:
         thread.start()
     def display_loop(self):
         while True:
-            pass
+            self.draw.rectangle((0, 0, self.oled.width, self.oled.height), outline=0, fill=0)
+            doorLockStatusString = self.doorLock.getStatusString()
+            for i in range(len(doorLockStatusString)):
+                self.draw.text((0, 16*i), doorLockStatusString[i], font=self.font, fill=255)
+            self.oled.image(self.image)
+            self.oled.show()
+            time.sleep(self.LOOPTIME)
             # TODO: display door lock status
             # check status [locked/attempted to unlock/unlocked]
             # """

@@ -11,7 +11,8 @@ class DoorLock:
     def __init__(self):
         print("Door lock is starting...")
         self.locked = True
-        self.isShowStatus = False
+        self.maxUnlockTime = 5
+        self.timeBeforeLock = 0
         print("Setting up NFC reader...")
         self.i2c = busio.I2C(board.SCL, board.SDA)
         self.reset_pin = DigitalInOut(board.D6)
@@ -35,14 +36,6 @@ class DoorLock:
         # TODO: unlock the door and change status
         pass
 
-    # status
-
-    def show_door_lock_status(self):
-        self.isShowStatus = True
-
-    def hide_door_lock_status(self):
-        self.isShowStatus = False
-
     def detectKeyCard(self):
         # while True:
         # #
@@ -56,3 +49,18 @@ class DoorLock:
                 continue
             print("Found card with UID:", [hex(i) for i in uid])
 
+    def getStatusString(self):
+        displayString = []
+        if not self.locked:
+            displayString.append("Door Lock status: Unlocked")
+            displayString.append("the door will lock in " + self.timeBeforeLock + "seconds")
+            return displayString
+        if self.locked:
+            displayString.append("Door Lock status: Locked")
+            if self.attempted_to_unlock:
+                displayString.append("Attemded to unlock:")
+                displayString.append("We have sent numbers to your phohe. Tap &random_num to unlock")
+            else:
+                displayString.append("waiting to unlock")
+            return displayString
+        return "Welcome to the Door Lock System!"
