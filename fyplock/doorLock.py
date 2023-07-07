@@ -53,15 +53,17 @@ class DoorLock:
     def getStatusString(self):
         displayString = []
         if not self.locked:
-            displayString.append("Door Lock status: Unlocked")
+            displayString.append("Door Lock status: ")
+            displayString.append("Unlocked")
             displayString.append("the door will lock in " + self.timeBeforeLock + "seconds")
             return displayString
         if self.locked:
-            displayString.append("Door Lock status: Locked")
+            displayString.append("Door Lock status: 12345678990123456")
             if self.attempted_to_unlock:
-                displayString.append("Attemded to unlock:")
-                displayString.append("We have sent numbers to your phohe. Tap &random_num to unlock")
+                displayString.append("Attemded to unlock")
+                displayString.append("Tap &random_num to unlock")
             else:
+                displayString.append("Locked")
                 displayString.append("waiting to unlock")
             return displayString
         return "Welcome to the Door Lock System!"
