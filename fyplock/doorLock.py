@@ -11,6 +11,7 @@ class DoorLock:
     def __init__(self):
         print("Door lock is starting...")
         self.locked = True
+        self.attempted_to_unlock = False
         self.maxUnlockTime = 5
         self.timeBeforeLock = 0
         print("Setting up NFC reader...")
