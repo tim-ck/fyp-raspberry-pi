@@ -58,7 +58,7 @@ class DoorLock:
             displayString.append("the door will lock in " + self.timeBeforeLock + "seconds")
             return displayString
         if self.locked:
-            displayString.append("Door Lock status: 12345678990123456")
+            displayString.append("Door Lock status: ")
             if self.attempted_to_unlock:
                 displayString.append("Attemded to unlock")
                 displayString.append("Tap &random_num to unlock")
