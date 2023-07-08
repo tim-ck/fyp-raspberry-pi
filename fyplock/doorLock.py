@@ -4,6 +4,16 @@ import busio
 import threading
 from digitalio import DigitalInOut, Direction, Pull
 from adafruit_pn532.i2c import PN532_I2C
+from adafruit_pn532.adafruit_pn532 import COMMAND_TGGETDATA
+from adafruit_pn532.adafruit_pn532 import COMMAND_TGSETDATA
+
+def printString(data1):
+    out = ''
+    for x in range(len(data1)):
+        out += '%02x' % data1[x]
+    return out
+
+
 
 class DoorLock:
 
@@ -43,6 +53,7 @@ class DoorLock:
 
     def detect_android_nfc_key(self):
         print("detecting android nfc key...")
+          # select apdu command AID "0xA0000010000112"
         while True:
             self.pn532.listen_for_passive_target()
             uid = self.pn532.get_passive_target()
@@ -50,26 +61,13 @@ class DoorLock:
                 print("card not found")
                 continue
             print("Found card with UID:", [hex(i) for i in uid])
-    #             #         send adpu command to android phone
-    #             uid = self.pn532.read_passive_target()
-    #             print(".", end="")
-    #             if uid is not None:
-    #                 break
-    #         print("")
-    #
-    #         print("Found card with UID:", [hex(i) for i in uid])
-    #         print("Authenticating block 4 ...")
-    #         cardApdu = [0x00, 0xA4, 0x04, 0x00, 0x07, 0xA0, 0x00, 0x00, 0x10, 0x00, 0x01,
-    #                     0x12, 0x00]  # select apdu command AID "0xA0000010000112"
-    #
-    #     def sendAPDU(self, apdu):
-    #         sendData = self.pn532.call_function(COMMAND_TGSETDATA, params=apdu)
-    #
-    #     def getAPDU(self):
-    #         result = self.pn532.call_function(COMMAND_TGGETDATA, 255)
-    #         print(result)
-    #         apdu = nfc.Apdu.from_buffer(result)
-    #         return apdu
+            apdu = [0x00, 0xA4, 0x04, 0x00, 0x07, 0xA0, 0x00, 0x00, 0x10, 0x00, 0x01,
+                        0x12, 0x00]
+            sendData = self.pn532.call_function(COMMAND_TGSETDATA, params=apdu)
+            result = self.pn532.call_function(COMMAND_TGGETDATA, 255)
+            print(result)
+            apdu = printString(result)[2:]
+            print(apdu)
 
     def getStatusString(self):
         displayString = []
