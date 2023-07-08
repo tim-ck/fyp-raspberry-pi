@@ -7,12 +7,11 @@ from adafruit_pn532.i2c import PN532_I2C
 from adafruit_pn532.adafruit_pn532 import _COMMAND_TGGETDATA
 from adafruit_pn532.adafruit_pn532 import _COMMAND_TGSETDATA
 
-def printString(data1):
-    out = ''
-    for x in range(len(data1)):
-        out += '%02x' % data1[x]
-    return out
 
+def printString(data1):
+    # bytearray(b'%') to string
+    data2 = data1.decode("utf-8")
+    return data2
 
 
 class DoorLock:
@@ -53,21 +52,21 @@ class DoorLock:
 
     def detect_android_nfc_key(self):
         print("detecting android nfc key...")
-          # select apdu command AID "0xA0000010000112"
+        # select apdu command AID "0xA0000010000112"
         while True:
-            self.pn532.listen_for_passive_target()
-            uid = self.pn532.get_passive_target()
-            if uid is None:
-                print("card not found")
-                continue
-            print("Found card with UID:", [hex(i) for i in uid])
-            apdu = [0x00, 0xA4, 0x04, 0x00, 0x07, 0xA0, 0x00, 0x00, 0x10, 0x00, 0x01,
-                        0x12, 0x00]
-            sendData = self.pn532.call_function(_COMMAND_TGSETDATA, params=apdu)
-            result = self.pn532.call_function(_COMMAND_TGGETDATA, 255)
-            print(result)
-            apdu = printString(result)[2:]
-            print(apdu)
+            uid = self.pn532.read_passive_target(timeout=0.5)
+            print(".", end="")
+            # Try again if no card is available.
+            if uid is not None:
+                break
+        print("Found card with UID:", [hex(i) for i in uid])
+        apdu = [0x00, 0xA4, 0x04, 0x00, 0x07, 0xA0, 0x00, 0x00, 0x10, 0x00, 0x01,
+                0x12, 0x00]
+        sendData = self.pn532.call_function(_COMMAND_TGSETDATA, params=apdu)
+        result = self.pn532.call_function(_COMMAND_TGGETDATA, 255)
+        print(result)
+        apdu = printString(result)
+        print(apdu)
 
     def getStatusString(self):
         displayString = []
