@@ -58,7 +58,9 @@ class DoorLock:
             # Try again if no card is available.
             if uid is not None:
                 print("Found card with UID:", [hex(i) for i in uid])
+                # apdu create
                 apdu = [0x00, 0xA4, 0x04, 0x00, 0x07, 0xF0, 0x39, 0x41, 0x48, 0x14, 0x81, 0x00, 0x00]
+                # aid = A0000010000112
                 print(apdu)
                 # select apdu command AID
                 sendData = self.pn532.call_function(_COMMAND_TGSETDATA, params=apdu)
