@@ -52,21 +52,23 @@ class DoorLock:
 
     def detect_android_nfc_key(self):
         print("detecting android nfc key...")
-        # select apdu command AID "0xA0000010000112"
         while True:
             uid = self.pn532.read_passive_target(timeout=0.5)
-            print(".", end="")
+            print(".")
             # Try again if no card is available.
             if uid is not None:
-                break
-        print("Found card with UID:", [hex(i) for i in uid])
-        apdu = [0x00, 0xA4, 0x04, 0x00, 0x07, 0xA0, 0x00, 0x00, 0x10, 0x00, 0x01,
-                0x12, 0x00]
-        sendData = self.pn532.call_function(_COMMAND_TGSETDATA, params=apdu)
-        result = self.pn532.call_function(_COMMAND_TGGETDATA, 255)
-        print(result)
-        apdu = printString(result)
-        print(apdu)
+                print("Found card with UID:", [hex(i) for i in uid])
+                apdu = [0x00, 0xA4, 0x04, 0x00, 0x07, 0xF0, 0x39, 0x41, 0x48, 0x14, 0x81, 0x00, 0x00]
+                print(apdu)
+                # select apdu command AID
+                sendData = self.pn532.call_function(_COMMAND_TGSETDATA, params=apdu)
+                result = self.pn532.call_function(_COMMAND_TGGETDATA, 255)
+                print(result)
+                apdu = printString(result)
+                print(apdu)
+                continue
+
+
 
     def getStatusString(self):
         displayString = []
