@@ -86,8 +86,12 @@ class DoorLock:
                 success, response = self.nfc.inDataExchange(selectApdu)
                 if (success):
 
-                    print("responseLength: {:d}", len(response))
+                    print("responseLength: Apdu {:d}", len(response))
                     print(binascii.hexlify(response))
+                    # response = bytearray([0x00, 0x00, 0x90, 0x00])
+                    # response to text
+                    print("trying to change to text")
+                    response = printString(response)
 
                     while (success):
                         apdu = bytearray(b"Hello from Arduino")
