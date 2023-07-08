@@ -100,6 +100,8 @@ class DoorLock:
                         if (success):
                             print("responseLength: {:d}", len(back))
                             print(binascii.hexlify(back))
+                            print("trying to change to text")
+                            response = printString(response)
                         else:
                             print("Broken connection?")
                 else:
