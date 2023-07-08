@@ -9,9 +9,10 @@ from adafruit_pn532.adafruit_pn532 import _COMMAND_TGSETDATA
 
 
 def printString(data1):
-    # bytearray(b'%') to string
-    data2 = data1.decode("utf-8")
-    return data2
+    out = ''
+    for x in range(len(data1)):
+        out += '%02x' % data1[x]
+    return out
 
 
 class DoorLock:
