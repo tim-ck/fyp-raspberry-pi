@@ -63,8 +63,8 @@ class DoorLock:
             print("Found card with UID:", [hex(i) for i in uid])
             apdu = [0x00, 0xA4, 0x04, 0x00, 0x07, 0xA0, 0x00, 0x00, 0x10, 0x00, 0x01,
                         0x12, 0x00]
-            sendData = self.pn532.call_function(COMMAND_TGSETDATA, params=apdu)
-            result = self.pn532.call_function(COMMAND_TGGETDATA, 255)
+            sendData = self.pn532.call_function(_COMMAND_TGSETDATA, params=apdu)
+            result = self.pn532.call_function(_COMMAND_TGGETDATA, 255)
             print(result)
             apdu = printString(result)[2:]
             print(apdu)
