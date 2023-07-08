@@ -4,11 +4,7 @@ import busio
 import threading
 from digitalio import DigitalInOut, Direction, Pull
 from adafruit_pn532.i2c import PN532_I2C
-# get data from adpu android hce
-# from adafruit_pn532.adafruit_pn532 import COMMAND_TGGETDATA
-# from adafruit_pn532.adafruit_pn532 import COMMAND_TGSETDATA
-# import pn532pi.nfc as nfc
-import ndef
+
 class DoorLock:
 
     def __init__(self):
