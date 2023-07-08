@@ -87,8 +87,9 @@ class DoorLock:
                 if (success):
 
                     print("responseLength: Apdu {:d}", len(response))
-                    #     RTD_TEXT byte to text
-                    print("response: Apdu {:s}", binascii.hexlify(response))
+                    print("response: Apdu {:s}", response)
+                    #     RTD_TEXT byte to string using python
+                    #     https://stackoverflow.com/questions/606191/convert-bytes-to-a-string
 
 
                 else:
