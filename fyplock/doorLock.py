@@ -74,7 +74,7 @@ class DoorLock:
             success = self.nfc.inListPassiveTarget()
             if (success):
                 print("Found something!")
-
+                # RTD_TEXT
                 selectApdu = bytearray([0x00,  # CLA
                                         0xA4,  # INS
                                         0x04,  # P1
@@ -87,23 +87,10 @@ class DoorLock:
                 if (success):
 
                     print("responseLength: Apdu {:d}", len(response))
-                    print(binascii.hexlify(response))
-                    # response = bytearray([0x00, 0x00, 0x90, 0x00])
-                    # response to text
-                    print("trying to change to text")
-                    response = printString(response)
+                    #     RTD_TEXT byte to text
+                    print("response: Apdu {:s}", binascii.hexlify(response))
 
-                    while (success):
-                        apdu = bytearray(b"Hello from Arduino")
-                        success, back = self.nfc.inDataExchange(apdu)
 
-                        if (success):
-                            print("responseLength: {:d}", len(back))
-                            print(binascii.hexlify(back))
-                            print("trying to change to text")
-                            response = printString(response)
-                        else:
-                            print("Broken connection?")
                 else:
                     print("Failed sending SELECT AID")
             else:
