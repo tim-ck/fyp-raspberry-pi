@@ -4,8 +4,8 @@ import busio
 import threading
 from digitalio import DigitalInOut, Direction, Pull
 from adafruit_pn532.i2c import PN532_I2C
-from adafruit_pn532.adafruit_pn532 import COMMAND_TGGETDATA
-from adafruit_pn532.adafruit_pn532 import COMMAND_TGSETDATA
+from adafruit_pn532.adafruit_pn532 import _COMMAND_TGGETDATA
+from adafruit_pn532.adafruit_pn532 import _COMMAND_TGSETDATA
 
 def printString(data1):
     out = ''
