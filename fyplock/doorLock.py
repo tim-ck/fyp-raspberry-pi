@@ -2,10 +2,13 @@ import time
 import board
 import busio
 import threading
-from digitalio import DigitalInOut
+from digitalio import DigitalInOut, Direction, Pull
 from adafruit_pn532.i2c import PN532_I2C
-
-
+# get data from adpu android hce
+# from adafruit_pn532.adafruit_pn532 import COMMAND_TGGETDATA
+# from adafruit_pn532.adafruit_pn532 import COMMAND_TGSETDATA
+import pn532pi.nfc as nfc
+import ndef
 class DoorLock:
 
     def __init__(self):
@@ -51,6 +54,26 @@ class DoorLock:
                 print("card not found")
                 continue
             print("Found card with UID:", [hex(i) for i in uid])
+    #             #         send adpu command to android phone
+    #             uid = self.pn532.read_passive_target()
+    #             print(".", end="")
+    #             if uid is not None:
+    #                 break
+    #         print("")
+    #
+    #         print("Found card with UID:", [hex(i) for i in uid])
+    #         print("Authenticating block 4 ...")
+    #         cardApdu = [0x00, 0xA4, 0x04, 0x00, 0x07, 0xA0, 0x00, 0x00, 0x10, 0x00, 0x01,
+    #                     0x12, 0x00]  # select apdu command AID "0xA0000010000112"
+    #
+    #     def sendAPDU(self, apdu):
+    #         sendData = self.pn532.call_function(COMMAND_TGSETDATA, params=apdu)
+    #
+    #     def getAPDU(self):
+    #         result = self.pn532.call_function(COMMAND_TGGETDATA, 255)
+    #         print(result)
+    #         apdu = nfc.Apdu.from_buffer(result)
+    #         return apdu
 
     def getStatusString(self):
         displayString = []
