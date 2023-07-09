@@ -104,7 +104,7 @@ class DoorLock:
                     print("Failed sending SELECT AID")
             else:
                 print("Didn't find anything!")
-            time.sleep(2)
+            time.sleep(0.5)
 
             # uid = self.pn532.read_passive_target(timeout=0.5)
             # print(".")
