@@ -80,7 +80,7 @@ class DoorLock:
                                         0x04,  # P1
                                         0x00,  # P2
                                         0x07,  # Length of AID
-                                        0xF0, 0x39, 0x41, 0x48, 0x14, 0x81, 0x00,  # AID defined on Android App
+                                        0xF0, 0x39, 0x41, 0x48, 0x14, 0x81, 0x01,  # AID defined on Android App
                                         0x00  # Le
                                         ])
                 success, response = self.nfc.inDataExchange(selectApdu)
