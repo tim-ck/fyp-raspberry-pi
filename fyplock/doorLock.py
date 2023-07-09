@@ -83,6 +83,11 @@ class DoorLock:
                                         0xF0, 0x39, 0x41, 0x48, 0x14, 0x81, 0x01,  # AID defined on Android App
                                         0x00  # Le
                                         ])
+                selectApdu = bytearray([0x00,  # CLA
+                                        0xb0,  # INS
+                                        0x00,  # P1
+                                        0x00,  # P2
+                                        0x02])
                 success, response = self.nfc.inDataExchange(selectApdu)
                 if (success):
 
