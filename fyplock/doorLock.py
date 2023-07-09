@@ -83,19 +83,22 @@ class DoorLock:
                                         0xF0, 0x39, 0x41, 0x48, 0x14, 0x81, 0x01,  # AID defined on Android App
                                         0x00  # Le
                                         ])
-                selectApdu = bytearray([0x00,  # CLA
+                NDEFSelect = bytearray([0x00,  # CLA
                                         0xb0,  # INS
                                         0x00,  # P1
                                         0x00,  # P2
                                         0x02])
                 success, response = self.nfc.inDataExchange(selectApdu)
                 if (success):
-
+                    print(selectApdu)
                     print("responseLength: Apdu {:d}", len(response))
                     print("response: Apdu {:s}", response)
-                    #     RTD_TEXT byte to string using python
-                    #     https://stackoverflow.com/questions/606191/convert-bytes-to-a-string
-                    print(printString(response)[2:])
+                    success, response = self.nfc.inDataExchange(NDEFSelect)
+                    if (success):
+                        print(NDEFSelect)
+                        print("responseLength: NDEF {:d}", len(response))
+                        print("response: NDEF {:s}", response)
+
 
                 else:
                     print("Failed sending SELECT AID")
