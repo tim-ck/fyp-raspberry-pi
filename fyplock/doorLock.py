@@ -90,7 +90,7 @@ class DoorLock:
                     print("response: Apdu {:s}", response)
                     #     RTD_TEXT byte to string using python
                     #     https://stackoverflow.com/questions/606191/convert-bytes-to-a-string
-
+                    print(printString(response)[2:])
 
                 else:
                     print("Failed sending SELECT AID")
