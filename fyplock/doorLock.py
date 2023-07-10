@@ -119,7 +119,7 @@ class DoorLock:
     def start_a_challenge(self, secret_key):
         for i in range(1,6):
             print("sending random number to android app for " + str(i) + " time")
-            success, response = self.nfc.inDataExchange(self.random_number)
+            success, response = self.nfc.inDataExchange(self.random_number.to_bytes(1, byteorder='big'))
             if (success):
                 print("responseLength: {:d}", len(response))
                 if response == RESPONSE_OKAY:
