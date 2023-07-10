@@ -1,6 +1,9 @@
+import random
 import time
 import binascii
 
+import hmac
+import hashlib
 import board
 import busio
 import threading
@@ -11,11 +14,29 @@ from digitalio import DigitalInOut, Direction, Pull
 from pn532pi import Pn532
 from pn532pi import Pn532I2c
 
-def printString(data1):
-    out = ''
-    for x in range(len(data1)):
-        out += '%02x' % data1[x]
-    return out
+from keyDB import getSecretKeyByID
+
+RESPONSE_OKAY = bytearray([0x90, 0x00])
+RESPONSE_WAITING_USER_INPUT = bytearray([0x91, 0x00])
+GET_KEYID = bytearray([0x00,  # CLA
+                                        0xA4,  # INS
+                                        0x04,  # P1
+                                        0x00,  # P2
+                                        0x07,  # Length of AID
+                                        0xF0, 0x39, 0x41, 0x48, 0x14, 0x81, 0x01,  # AID defined on Android App
+                                        0x00  # Le
+                                        ])
+GET_PASSCODE = bytearray([0x00,  # CLA
+                                        0xA4,  # INS
+                                        0x04,  # P1
+                                        0x00,  # P2
+                                        0x07,  # Length of AID
+                                        0xF0, 0x39, 0x41, 0x48, 0x14, 0x81, 0x02,  # AID defined on Android App
+                                        0x00  # Le
+                                        ])
+
+def HMAC_SHA256(key, message):
+    return hmac.new(key, message, hashlib.sha256).digest()
 
 
 class DoorLock:
@@ -24,117 +45,138 @@ class DoorLock:
         print("Door lock is starting...")
         self.locked = True
         self.attempted_to_unlock = False
-        self.maxUnlockTime = 5
-        self.timeBeforeLock = 0
+        self.failed_to_unlock = False
+        self.random_number = -1
+        self.maxTimeSendRandomNumber = 5
+        self.max_time_to_wait_for_passcode = 30
+        self.max_time_for_unlock = 30
+        self.time_before_lock = 0
+        self.numberOfTimeSendRandomNumber = 0
+
         print("Setting up NFC reader...")
-        # self.i2c = busio.I2C(board.SCL, board.SDA)
-        # self.reset_pin = DigitalInOut(board.D6)
-        # self.req_pin = DigitalInOut(board.D12)
-        # self.irq_pin = DigitalInOut(board.D10)
-        # self.pn532 = PN532_I2C(self.i2c, debug=False, reset=self.reset_pin, req=self.req_pin, irq=self.irq_pin)
-        # self.ic, self.ver, self.rev, self.support = self.pn532.firmware_version
-        # # TODO: add try catch for pn532 not found
-        # print("Found PN532 with firmware version: {0}.{1}".format(self.ver, self.rev))
-        # self.pn532.SAM_configuration()
-        # ========
         self.PN532_I2C = Pn532I2c(1)
         self.nfc = Pn532(self.PN532_I2C)
         self.nfc.begin()
         versiondata = self.nfc.getFirmwareVersion()
         if not versiondata:
             print("Didn't find PN53x board")
-            raise RuntimeError("Didn't find PN53x board")  # halt
-            # Got ok data, print it out!
+            raise RuntimeError("Didn't find PN53x board")
         print("Found chip PN5 {:#x} Firmware ver. {:d}.{:d}".format((versiondata >> 24) & 0xFF,
                                                                     (versiondata >> 16) & 0xFF,
                                                                     (versiondata >> 8) & 0xFF))
         self.nfc.SAMConfig()
-
-        # new thread to detect nfc card
         print("Starting NFC card detection thread...")
         self.nfc_thread = threading.Thread(target=self.detect_android_nfc_key)
         self.nfc_thread.start()
+
+    def reset_door_lock_status(self):
+        self.locked = True
+        self.attempted_to_unlock = False
+        self.failed_to_unlock = False
 
     def lock(self):
         # TODO: lock the door and change status
         pass
 
     def unlock(self):
-        # TODO: unlock the door and change status
-        pass
+        self.locked = False
+        self.time_before_lock = self.max_time_for_unlock
+        while(self.time_before_lock > 0):
+            self.time_before_lock -= 1
+            time.sleep(1)
+        self.original_status()
 
-    def detectKeyCard(self):
-        # while True:
-        # #
-        pass
+    def authenticate_failed(self):
+        for i in range(5):
+            self.failed_to_unlock = True
+            time.sleep(1)
+        self.reset_door_lock_status()
+
+    def wait_for_passcode(self, secret_key):
+        for i in range(self.max_time_to_wait_for_passcode, 0, -1):
+            print("waiting for passcode: " + str(i))
+            success, response = self.nfc.inDataExchange(GET_PASSCODE)
+            # response length should be 4 bytes
+            if (success and len(response) == 4):
+                print("responseLength: {:d}", len(response))
+                if response == HMAC_SHA256(secret_key, self.random_number):
+                    self.unlock()
+                    return
+                else:
+                    self.authenticate_failed()
+                    return
+            time.sleep(1)
+        self.authenticate_failed()
+
+    def start_a_fake_challenge(self):
+        for i in range(5):
+            time.sleep(1)
+        self.authenticate_failed()
+
+    def start_a_challenge(self, secret_key):
+        for i in range(1,6):
+            print("sending random number to android app for " + str(i) + " time")
+            success, response = self.nfc.inDataExchange(self.random_number)
+            if (success):
+                print("responseLength: {:d}", len(response))
+                if response == RESPONSE_OKAY:
+                    self.wait_for_passcode(secret_key)
+                    return
+        self.authenticate_failed()
+
+
+    def authenticate(self, keyID):
+        is_key_exist, secret_key = getSecretKeyByID(keyID)
+        self.random_number = random.randint(0, 255)
+        self.locked = True
+        self.attempted_to_unlock = True
+        if not is_key_exist:
+            print("key not exist")
+            self.start_a_fake_challenge()
+        else:
+            print("key exist")
+            self.start_a_challenge(secret_key)
 
     def detect_android_nfc_key(self):
         print("detecting android nfc key...")
         while True:
+            self.reset_door_lock_status()
             success = self.nfc.inListPassiveTarget()
             if (success):
                 # RTD_TEXT
-                selectApdu = bytearray([0x00,  # CLA
-                                        0xA4,  # INS
-                                        0x04,  # P1
-                                        0x00,  # P2
-                                        0x07,  # Length of AID
-                                        0xF0, 0x39, 0x41, 0x48, 0x14, 0x81, 0x01,  # AID defined on Android App
-                                        0x00  # Le
-                                        ])
-                success, response = self.nfc.inDataExchange(selectApdu)
+                select_apdu = GET_KEYID
+                success, response = self.nfc.inDataExchange(select_apdu)
                 if (success):
-                    print(selectApdu)
+                    print(select_apdu)
                     print("responseLength: Apdu {:d}", len(response))
-                    decodedString = response.decode("utf-8")
-                    print(decodedString)
-
-                    while (success):
-                        selectApdu = bytearray(b"Hello from Arduino")
-                        success, response = self.nfc.inDataExchange(selectApdu)
-                        if (success):
-                            print("responseLength: {:d}", len(response))
-                            decodedString = response.decode("utf-8")
-                            print(decodedString)
-                        else:
-                            print("disconnected")
+                    keyID = response[0:4]
+                    self.authenticate(keyID)
                 else:
                     print("Failed sending SELECT AID")
             else:
                 print("Didn't find anything!")
-            time.sleep(0.5)
+            time.sleep(1)
 
-            # uid = self.pn532.read_passive_target(timeout=0.5)
-            # print(".")
-            # # Try again if no card is available.
-            # if uid is not None:
-            #     print("Found card with UID:", [hex(i) for i in uid])
-            #     # apdu create
-            #     apdu = [0x00, 0xA4, 0x04, 0x00, 0x07, 0xF0, 0x39, 0x41, 0x48, 0x14, 0x81, 0x00, 0x00]
-            #     # aid = A0000010000112
-            #     print(apdu)
-            #     # select apdu command AID
-            #     sendData = self.pn532.call_function(_COMMAND_TGSETDATA, params=apdu)
-            #     result = self.pn532.call_function(_COMMAND_TGGETDATA, 255)
-            #     print(result)
-            #     apdu = printString(result)
-            #     print(apdu)
-            #     continue
-
-
-
+    # status list: locked, failed_to_unlock, attempted_to_unlock
     def getStatusString(self):
         displayString = []
         if not self.locked:
             displayString.append("Door Lock status: ")
             displayString.append("Unlocked")
-            displayString.append("the door will lock in " + self.timeBeforeLock + "seconds")
+            displayString.append("the door will lock in " + str(self.timeBeforeLock) + "seconds")
+            return displayString
+        if self.failed_to_unlock:
+            displayString.append("Door Lock status: ")
+            displayString.append("Failed to unlock")
+            displayString.append("Please Try Again")
             return displayString
         if self.locked:
             displayString.append("Door Lock status: ")
             if self.attempted_to_unlock:
                 displayString.append("Attemded to unlock")
-                displayString.append("Tap &random_num to unlock")
+                displayString.append("seconds left: " + str(self.timeBeforeAttemdExpired))
+                displayString.append("Tap " + str(self.random_number) + " on your phone")
+                displayString.append("and tap the nfc reader to authenticat")
             else:
                 displayString.append("Locked")
                 displayString.append("waiting to unlock")
