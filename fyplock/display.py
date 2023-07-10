@@ -40,21 +40,6 @@ class Display:
             self.oled.image(self.image)
             self.oled.show()
             time.sleep(self.LOOPTIME)
-            # TODO: display door lock status
-            # check status [locked/attempted to unlock/unlocked]
-            # """
-            # Door Lock status: Locked
-            # waiting to unlock
-            # """
-            # """
-            # Door Lock status: Locked
-            # Attemded to unlock:
-            # We have sent numbers to your phohe. Tap &random_num to unlock
-            # """
-            # """
-            # Door Lock status: Unlocked
-            # the door will lock in 5 seconds
-            # """
 
 
 
