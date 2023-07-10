@@ -50,8 +50,8 @@ class DoorLock:
         self.maxTimeSendRandomNumber = 5
         self.max_time_to_wait_for_passcode = 30
         self.max_time_for_unlock = 30
+        self.timeBeforeAttemdExpired = 0
         self.time_before_lock = 0
-        self.numberOfTimeSendRandomNumber = 0
 
         print("Setting up NFC reader...")
         self.PN532_I2C = Pn532I2c(1)
@@ -93,7 +93,10 @@ class DoorLock:
         self.reset_door_lock_status()
 
     def wait_for_passcode(self, secret_key):
-        for i in range(self.max_time_to_wait_for_passcode, 0, -1):
+        self.attempted_to_unlock = True
+        self.timeBeforeAttemdExpired = self.max_time_to_wait_for_passcode
+        while self.timeBeforeAttemdExpired > 0:
+            self.timeBeforeAttemdExpired -= 1
             print("waiting for passcode: " + str(i))
             success, response = self.nfc.inDataExchange(GET_PASSCODE)
             # response length should be 4 bytes
@@ -129,7 +132,6 @@ class DoorLock:
         is_key_exist, secret_key = getSecretKeyByID(keyID)
         self.random_number = random.randint(0, 255)
         self.locked = True
-        self.attempted_to_unlock = True
         if not is_key_exist:
             print("key not exist")
             self.start_a_fake_challenge()
@@ -163,7 +165,7 @@ class DoorLock:
         if not self.locked:
             displayString.append("Door Lock status: ")
             displayString.append("Unlocked")
-            displayString.append("the door will lock in " + str(self.timeBeforeLock) + "seconds")
+            displayString.append("the door will lock in " + str(self.time_before_lock) + "seconds")
             return displayString
         if self.failed_to_unlock:
             displayString.append("Door Lock status: ")
