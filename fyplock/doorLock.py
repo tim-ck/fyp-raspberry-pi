@@ -34,6 +34,8 @@ GET_PASSCODE = bytearray([0x00,  # CLA
                                         0xF0, 0x39, 0x41, 0x48, 0x14, 0x81, 0x02,  # AID defined on Android App
                                         0x00  # Le
                                         ])
+WRITE_RANDOM_NUMBER = bytearray([0x01, 0x2E])
+
 
 def HMAC_SHA256(key, message):
     return hmac.new(key, message, hashlib.sha256).digest()
@@ -46,6 +48,7 @@ class DoorLock:
         self.locked = True
         self.attempted_to_unlock = False
         self.failed_to_unlock = False
+        self.error_message = ""
         self.random_number = -1
         self.maxTimeSendRandomNumber = 5
         self.max_time_to_wait_for_passcode = 30
@@ -73,6 +76,7 @@ class DoorLock:
         self.locked = True
         self.attempted_to_unlock = False
         self.failed_to_unlock = False
+        self.error_message = ""
 
     def lock(self):
         # TODO: lock the door and change status
@@ -86,9 +90,10 @@ class DoorLock:
             time.sleep(1)
         self.original_status()
 
-    def authenticate_failed(self):
+    def authenticate_failed(self, error_message):
         for i in range(5):
             self.failed_to_unlock = True
+            self.error_message = error_message
             time.sleep(1)
         self.reset_door_lock_status()
 
@@ -97,7 +102,7 @@ class DoorLock:
         self.timeBeforeAttemdExpired = self.max_time_to_wait_for_passcode
         while self.timeBeforeAttemdExpired > 0:
             self.timeBeforeAttemdExpired -= 1
-            print("waiting for passcode: " + str(i))
+            print("waiting for passcode: " + str(self.timeBeforeAttemdExpired))
             success, response = self.nfc.inDataExchange(GET_PASSCODE)
             # response length should be 4 bytes
             if (success and len(response) == 4):
@@ -106,26 +111,28 @@ class DoorLock:
                     self.unlock()
                     return
                 else:
-                    self.authenticate_failed()
+                    self.authenticate_failed("incorrect passcode")
                     return
             time.sleep(1)
-        self.authenticate_failed()
+        self.authenticate_failed("time expired")
 
     def start_a_fake_challenge(self):
         for i in range(5):
             time.sleep(1)
-        self.authenticate_failed()
+        self.authenticate_failed("failed to send challenge number")
 
     def start_a_challenge(self, secret_key):
         for i in range(1,6):
             print("sending random number to android app for " + str(i) + " time")
-            success, response = self.nfc.inDataExchange(self.random_number.to_bytes(1, byteorder='big'))
+            # //WRITE_RANDOM_NUMBER + random_number
+            apdu = WRITE_RANDOM_NUMBER + bytearray(self.random_number.to_bytes(1, byteorder='big'))
+            success, response = self.nfc.inDataExchange(apdu)
             if (success):
                 print("responseLength: {:d}", len(response))
                 if response == RESPONSE_OKAY:
                     self.wait_for_passcode(secret_key)
                     return
-        self.authenticate_failed()
+        self.authenticate_failed("failed to send challenge number")
 
 
     def authenticate(self, keyID):
@@ -170,7 +177,8 @@ class DoorLock:
         if self.failed_to_unlock:
             displayString.append("Door Lock status: ")
             displayString.append("Failed to unlock")
-            displayString.append("Please Try Again")
+            if self.error_message != "":
+                displayString.append("ERROR: " + self.error_message)
             return displayString
         if self.locked:
             displayString.append("Door Lock status: ")
