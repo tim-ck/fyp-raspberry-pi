@@ -113,12 +113,12 @@ class DoorLock:
                 else:
                     self.authenticate_failed("incorrect passcode")
                     return
-            time.sleep(1)
+            time.sleep(2)
         self.authenticate_failed("time expired")
 
     def start_a_fake_challenge(self):
         for i in range(5):
-            time.sleep(1)
+            time.sleep(2)
         self.authenticate_failed("failed to send challenge number")
 
     def start_a_challenge(self, secret_key):
@@ -164,7 +164,7 @@ class DoorLock:
                     print("Failed sending SELECT AID")
             else:
                 print("Didn't find anything!")
-            time.sleep(1)
+            time.sleep(2)
 
     # status list: locked, failed_to_unlock, attempted_to_unlock
     def getStatusString(self):
