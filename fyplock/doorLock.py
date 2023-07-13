@@ -79,7 +79,7 @@ class DoorLock:
         self.error_message = ""
 
     def lock(self):
-        # TODO: lock the door and change status
+        self.locked = True
         pass
 
     def unlock(self):
@@ -88,7 +88,7 @@ class DoorLock:
         while(self.time_before_lock > 0):
             self.time_before_lock -= 1
             time.sleep(1)
-        self.original_status()
+        self.lock()
 
     def authenticate_failed(self, error_message):
         for i in range(5):
@@ -104,8 +104,7 @@ class DoorLock:
             self.timeBeforeAttemdExpired -= 1
             print("waiting for passcode: " + str(self.timeBeforeAttemdExpired))
             success, response = self.nfc.inDataExchange(GET_PASSCODE)
-            # response length should be 4 bytes
-            if (success and len(response) == 4):
+            if success and len(response) == 4:
                 print("responseLength: {:d}", len(response))
                 if response == HMAC_SHA256(secret_key, self.random_number):
                     self.unlock()
@@ -117,8 +116,27 @@ class DoorLock:
         self.authenticate_failed("time expired")
 
     def start_a_fake_challenge(self):
-        for i in range(5):
-            time.sleep(2)
+        for i in range(1, 6):
+            print("sending random number to android app for " + str(i) + " time")
+            # //WRITE_RANDOM_NUMBER + random_number
+            apdu = WRITE_RANDOM_NUMBER + bytearray(self.random_number.to_bytes(1, byteorder='big'))
+            success, response = self.nfc.inDataExchange(apdu)
+            if (success):
+                print("responseLength: {:d}", len(response))
+                if response == RESPONSE_OKAY:
+                    self.timeBeforeAttemdExpired = self.max_time_to_wait_for_passcode
+                    while self.timeBeforeAttemdExpired > 0:
+                        self.timeBeforeAttemdExpired -= 1
+                        print("[fake]waiting for passcode: " + str(self.timeBeforeAttemdExpired))
+                        success, response = self.nfc.inDataExchange(GET_PASSCODE)
+                        # response length should be 4 bytes
+                        if success and len(response) == 4:
+                            print("responseLength: {:d}", len(response))
+                            self.authenticate_failed("incorrect passcode")
+                            return
+                        time.sleep(2)
+                    self.authenticate_failed("time expired")
+                    return
         self.authenticate_failed("failed to send challenge number")
 
     def start_a_challenge(self, secret_key):
