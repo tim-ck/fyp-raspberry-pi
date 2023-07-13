@@ -17,23 +17,29 @@ class MainProgram:
         self.display = Display(self.doorLock)
         print("System started")
 
-    def hide_door_lock_status(self):
-        # self.doorLock.hide_door_lock_status()
-        if mainProgram == None:
-            print("mainProgram is None")
-            return
-        mainProgram.main_menu()
+    def add_key(self):
+        print("Add new key:")
+        print("Enter key id to your phone:{:d}".format(self.random_number))
+        print("Enter id from ur phone")
+
+        pass
+
+
 
     def manage_keys(self):
-        print("Manage keys: (press x to back to main menu)")
+        print("Manage keys: ")
         print("=====================")
         print("1. add new key")
-        print("2. remove key")
+        print("2. main menu")
         option = input("Enter option: ")
         if option == "1":
             self.add_key()
-        if option == "2":
-            self.remove_key()
+        elif option == "2":
+            self.main_menu()
+        else:
+            print("Invalid option")
+            self.manage_keys()
+
 
     def main_menu(self):
         print("Welcome to FYP Project - Door Lock System")
@@ -52,6 +58,8 @@ class MainProgram:
 
     def main(self):
         self.main_menu()
+
+
 
 
 mainProgram = MainProgram()
