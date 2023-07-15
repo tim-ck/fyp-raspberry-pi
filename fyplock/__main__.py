@@ -19,7 +19,7 @@ class MainProgram:
 
     def add_key(self):
         print("Add new key:")
-        print("Enter key id to your phone:{:d}".format(self.random_number))
+        print("Enter key id to your phone")
         print("Enter id from ur phone")
 
         pass
