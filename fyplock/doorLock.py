@@ -87,14 +87,14 @@ class DoorLock:
         self.time_before_lock = self.max_time_for_unlock
         while(self.time_before_lock > 0):
             self.time_before_lock -= 1
-            time.sleep(1)
+            time.sleep(1.2)
         self.lock()
 
     def authenticate_failed(self, error_message):
         for i in range(5):
             self.failed_to_unlock = True
             self.error_message = error_message
-            time.sleep(1)
+            time.sleep(1.2)
         self.reset_door_lock_status()
 
     def wait_for_passcode(self, secret_key):
@@ -105,14 +105,15 @@ class DoorLock:
             print("waiting for passcode: " + str(self.timeBeforeAttemdExpired))
             success, response = self.nfc.inDataExchange(GET_PASSCODE)
             if success and len(response) == 4:
-                print("responseLength: {:d}", len(response))
+                print("response: " + str(response))
+                print("responseLength: {:d}".format(len(response)))
                 if response == HMAC_SHA256(secret_key, self.random_number):
                     self.unlock()
                     return
                 else:
                     self.authenticate_failed("incorrect passcode")
                     return
-            time.sleep(2)
+            time.sleep(1.2)
         self.authenticate_failed("time expired")
 
     def start_a_fake_challenge(self):
@@ -122,7 +123,8 @@ class DoorLock:
             apdu = WRITE_RANDOM_NUMBER + bytearray(self.random_number.to_bytes(1, byteorder='big'))
             success, response = self.nfc.inDataExchange(apdu)
             if (success):
-                print("responseLength: {:d}", len(response))
+                print("response: " + str(response))
+                print("responseLength: {:d}".format(len(response)))
                 if response == RESPONSE_OKAY:
                     self.timeBeforeAttemdExpired = self.max_time_to_wait_for_passcode
                     while self.timeBeforeAttemdExpired > 0:
@@ -131,10 +133,11 @@ class DoorLock:
                         success, response = self.nfc.inDataExchange(GET_PASSCODE)
                         # response length should be 4 bytes
                         if success and len(response) == 4:
-                            print("responseLength: {:d}", len(response))
+                            print("response: " + str(response))
+                            print("responseLength: {:d}".format(len(response)))
                             self.authenticate_failed("incorrect passcode")
                             return
-                        time.sleep(2)
+                        time.sleep(1.2)
                     self.authenticate_failed("time expired")
                     return
         self.authenticate_failed("failed to send challenge number")
@@ -146,7 +149,8 @@ class DoorLock:
             apdu = WRITE_RANDOM_NUMBER + bytearray(self.random_number.to_bytes(1, byteorder='big'))
             success, response = self.nfc.inDataExchange(apdu)
             if (success):
-                print("responseLength: {:d}", len(response))
+                print("responseLength: {:d}".format(len(response)))
+                print("response: " + str(response))
                 if response == RESPONSE_OKAY:
                     self.wait_for_passcode(secret_key)
                     return
@@ -176,13 +180,14 @@ class DoorLock:
                 if (success):
                     print(select_apdu)
                     print("responseLength: Apdu {:d}", len(response))
+                    print("response: " + str(response))
                     keyID = response[0:4]
                     self.authenticate(keyID)
                 else:
                     print("Failed sending SELECT AID")
             else:
                 print("Didn't find anything!")
-            time.sleep(2)
+            time.sleep(1.2)
 
     # status list: locked, failed_to_unlock, attempted_to_unlock
     def getStatusString(self):
