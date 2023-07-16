@@ -147,7 +147,7 @@ class DoorLock:
         second_byte = random.randint(0, 255)
         third_byte = self.random_number
         random.shuffle([first_byte, second_byte, third_byte])
-        print("array: " + str(first_byte) + " " + str(second_byte) + " " + str(third_byte))
+        print("generate_three_bytearray_with_random_order: " + str(first_byte) + " " + str(second_byte) + " " + str(third_byte))
         return bytearray(first_byte.to_bytes(1, byteorder='big')) + \
             bytearray(second_byte.to_bytes(1, byteorder='big')) + \
             bytearray(third_byte.to_bytes(1, byteorder='big'))
@@ -157,6 +157,7 @@ class DoorLock:
             print("sending random number to android app for " + str(i) + " time")
             # //WRITE_RANDOM_NUMBER + random_number
             apdu = WRITE_RANDOM_NUMBER + self.generate_three_bytearray_with_random_order()
+            print("apdu: " + str(apdu))
             success, response = self.nfc.inDataExchange(apdu)
             if (success):
                 print("responseLength: {:d}".format(len(response)))
