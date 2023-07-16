@@ -148,9 +148,7 @@ class DoorLock:
         third_byte = self.random_number
         random.shuffle([first_byte, second_byte, third_byte])
         print("generate_three_bytearray_with_random_order: " + str(first_byte) + " " + str(second_byte) + " " + str(third_byte))
-        return bytearray(first_byte.to_bytes(1, byteorder='big')) + \
-            bytearray(second_byte.to_bytes(1, byteorder='big')) + \
-            bytearray(third_byte.to_bytes(1, byteorder='big'))
+        return bytearray([first_byte, second_byte, third_byte])
 
     def start_a_challenge(self, secret_key):
         for i in range(1,6):
