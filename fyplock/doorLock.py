@@ -162,12 +162,6 @@ class DoorLock:
                         time.sleep(1.1)
                         continue
                     if response == correctAnswer:
-                        success = self.nfc.inListPassiveTarget()
-                        if success:
-                            success, response = self.nfc.inDataExchange(unlock_success)
-                            if success:
-                                print("unlock_success response: ")
-                                printBytes(response)
                         self.unlock()
                         return
                     else:
@@ -269,7 +263,8 @@ class DoorLock:
         if not self.locked:
             displayString.append("Door Lock status: ")
             displayString.append("Unlocked")
-            displayString.append("the door will lock in " + str(self.time_before_lock) + "seconds")
+            displayString.append("the door will lock in:")
+            displayString.append(str(self.timeBeforeLock))
             return displayString
         if self.failed_to_unlock:
             displayString.append("Door Lock status: ")
@@ -278,13 +273,13 @@ class DoorLock:
                 displayString.append("ERROR: " + self.error_message)
             return displayString
         if self.locked:
-            displayString.append("Door Lock status: ")
             if self.attempted_to_unlock:
-                displayString.append("Attemded to unlock")
-                displayString.append("seconds left: " + str(self.timeBeforeAttemdExpired))
+                displayString.append(str(self.random_number))
                 displayString.append("Tap " + str(self.random_number) + " on your phone")
+                displayString.append("seconds left: " + str(self.timeBeforeAttemdExpired))
                 displayString.append("and tap the nfc reader to authenticat")
             else:
+                displayString.append("Door Lock status: ")
                 displayString.append("Locked")
                 displayString.append("waiting to unlock")
             return displayString
