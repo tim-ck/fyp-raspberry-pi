@@ -150,7 +150,7 @@ class DoorLock:
         while self.timeBeforeAttemdExpired > 0:
             self.timeBeforeAttemdExpired -= 1
             print("waiting for passcode: " + str(self.timeBeforeAttemdExpired))
-            success = self.nfc.inListPassiveTarget()
+            success = self.nfc.inListPassiveTarget(timeout=0.5)
             if success:
                 success, response = self.nfc.inDataExchange(GET_PASSCODE)
                 print("success: " + str(success))
@@ -159,7 +159,7 @@ class DoorLock:
                     printBytes(response)
                     print("responseLength: {:d}".format(len(response)))
                     if success and response == waiting_for_user_input:
-                        time.sleep(1.1)
+                        time.sleep(1)
                         continue
                     if response == correctAnswer:
                         self.unlock()
