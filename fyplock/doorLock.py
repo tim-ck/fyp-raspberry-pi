@@ -123,6 +123,7 @@ class DoorLock:
 
     def authenticate_failed(self, error_message):
         self.nfc.inDataExchange(unlock_failed)
+        print("failed to unlock: " + unlock_failed)
         for i in range(5):
             self.failed_to_unlock = True
             self.error_message = error_message
@@ -148,6 +149,7 @@ class DoorLock:
                         continue
                     if response == HMAC_SHA256(secret_key, self.random_number):
                         self.nfc.inDataExchange(unlock_success)
+                        print("unlock: " + unlock_success)
                         self.unlock()
                         return
                     else:
