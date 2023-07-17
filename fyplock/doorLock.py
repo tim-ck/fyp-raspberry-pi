@@ -19,36 +19,58 @@ from keyDB import getSecretKeyByID
 RESPONSE_OKAY = bytearray([0x90, 0x00])
 RESPONSE_WAITING_USER_INPUT = bytearray([0x91, 0x00])
 GET_KEYID = bytearray([0x00,  # CLA
-                                        0xA4,  # INS
-                                        0x04,  # P1
-                                        0x00,  # P2
-                                        0x07,  # Length of AID
-                                        0xF0, 0x39, 0x41, 0x48, 0x14, 0x81, 0x01,  # AID defined on Android App
-                                        0x00  # Le
-                                        ])
+                       0xA4,  # INS
+                       0x04,  # P1
+                       0x00,  # P2
+                       0x07,  # Length of AID
+                       0xF0, 0x39, 0x41, 0x48, 0x14, 0x81, 0x01,  # AID defined on Android App
+                       0x00  # Le
+                       ])
 GET_PASSCODE = bytearray([0x00,  # CLA
-                                        0xA4,  # INS
-                                        0x04,  # P1
-                                        0x00,  # P2
-                                        0x07,  # Length of AID
-                                        0xF0, 0x39, 0x41, 0x48, 0x14, 0x81, 0x02,  # AID defined on Android App
-                                        0x00  # Le
-                                        ])
+                          0xA4,  # INS
+                          0x04,  # P1
+                          0x00,  # P2
+                          0x07,  # Length of AID
+                          0xF0, 0x39, 0x41, 0x48, 0x14, 0x81, 0x02,  # AID defined on Android App
+                          0x00  # Le
+                          ])
 WRITE_RANDOM_NUMBER = bytearray([0x01, 0x2E])
 
 waiting_for_user_input = bytearray([0x00, 0x00, 0x00, 0x00])
 
+unlock_success = bytearray([0x00,  # CLA
+                            0xA4,  # INS
+                            0x04,  # P1
+                            0x00,  # P2
+                            0x07,  # Length of AID
+                            0xF0, 0x39, 0x41, 0x48, 0x14, 0x81, 0x03,  # AID defined on Android App
+                            0x00  # Le
+                            ])
+
+unlock_failed = bytearray([0x00,  # CLA
+                           0xA4,  # INS
+                           0x04,  # P1
+                           0x00,  # P2
+                           0x07,  # Length of AID
+                           0xF0, 0x39, 0x41, 0x48, 0x14, 0x81, 0x04,  # AID defined on Android App
+                           0x00  # Le
+                           ])
+
+
 def intToBytes(number):
     return number.to_bytes(4, "big")
+
 
 def HMAC_SHA256(key, message):
     return hmac.new(intToBytes(key), intToBytes(message), hashlib.sha256).digest()
 
+
 def printBytes(bytes):
-#     print as 0x..
+    #     print as 0x..
     for byte in bytes:
         print(hex(byte), end=" ")
     print()
+
 
 class DoorLock:
 
@@ -94,12 +116,13 @@ class DoorLock:
     def unlock(self):
         self.locked = False
         self.time_before_lock = self.max_time_for_unlock
-        while(self.time_before_lock > 0):
+        while (self.time_before_lock > 0):
             self.time_before_lock -= 1
             time.sleep(1.1)
         self.lock()
 
     def authenticate_failed(self, error_message):
+        self.nfc.inDataExchange(unlock_failed)
         for i in range(5):
             self.failed_to_unlock = True
             self.error_message = error_message
@@ -112,27 +135,29 @@ class DoorLock:
         while self.timeBeforeAttemdExpired > 0:
             self.timeBeforeAttemdExpired -= 1
             print("waiting for passcode: " + str(self.timeBeforeAttemdExpired))
-            success, response = self.nfc.inDataExchange(GET_PASSCODE)
-            print("success: "+str(success))
+            success = self.nfc.inListPassiveTarget()
             if success:
-                print("response: ")
-                printBytes(response)
-                print("responseLength: {:d}".format(len(response)))
-                if success and response == waiting_for_user_input:
-                    time.sleep(1.1
-    )
-                    continue
-                if response == HMAC_SHA256(secret_key, self.random_number):
-                    self.unlock()
-                    return
-                else:
-                    self.authenticate_failed("incorrect passcode")
-                    print("expected: ")
-                    print("secret_key: " + str(secret_key))
-                    print("random_number: " + str(self.random_number))
-                    printBytes(HMAC_SHA256(secret_key, self.random_number))
-                    return
-            time.sleep(1.1)
+                success, response = self.nfc.inDataExchange(GET_PASSCODE)
+                print("success: " + str(success))
+                if success:
+                    print("response: ")
+                    printBytes(response)
+                    print("responseLength: {:d}".format(len(response)))
+                    if success and response == waiting_for_user_input:
+                        time.sleep(1.1)
+                        continue
+                    if response == HMAC_SHA256(secret_key, self.random_number):
+                        self.nfc.inDataExchange(unlock_success)
+                        self.unlock()
+                        return
+                    else:
+                        self.authenticate_failed("incorrect passcode")
+                        print("expected: ")
+                        print("secret_key: " + str(secret_key))
+                        print("random_number: " + str(self.random_number))
+                        printBytes(HMAC_SHA256(secret_key, self.random_number))
+                        return
+                time.sleep(1.1)
         self.authenticate_failed("time expired")
 
     def start_a_fake_challenge(self):
@@ -157,8 +182,7 @@ class DoorLock:
                             print("responseLength: {:d}".format(len(response)))
                             self.authenticate_failed("incorrect passcode")
                             return
-                        time.sleep(1.1
-        )
+                        time.sleep(1.1)
                     self.authenticate_failed("time expired")
                     return
         self.authenticate_failed("failed to send challenge number")
@@ -168,24 +192,24 @@ class DoorLock:
         second_byte = random.randint(0, 255)
         third_byte = self.random_number
         random.shuffle([first_byte, second_byte, third_byte])
-        print("generate_three_bytearray_with_random_order: " + str(first_byte) + " " + str(second_byte) + " " + str(third_byte))
+        print("generate_three_bytearray_with_random_order: " + str(first_byte) + " " + str(second_byte) + " " + str(
+            third_byte))
         return bytearray([first_byte, second_byte, third_byte])
 
     def start_a_challenge(self, secret_key):
-        for i in range(1,6):
+        for i in range(1, 6):
             print("sending random number to android app for " + str(i) + " time")
             apdu = WRITE_RANDOM_NUMBER + self.generate_three_bytearray_with_random_order()
             print("apdu: " + str(apdu))
             success, response = self.nfc.inDataExchange(apdu)
             if (success):
                 print("responseLength: {:d}".format(len(response)))
-                print("response: " )
+                print("response: ")
                 printBytes(response)
                 if response == RESPONSE_OKAY:
                     self.wait_for_passcode(secret_key)
                     return
         self.authenticate_failed("failed to send challenge number")
-
 
     def authenticate(self, keyID):
         is_key_exist, secret_key = getSecretKeyByID(keyID)
@@ -218,7 +242,6 @@ class DoorLock:
                     time.sleep(1.1)
             else:
                 print("Didn't find anything!")
-
 
     # status list: locked, failed_to_unlock, attempted_to_unlock
     def getStatusString(self):
