@@ -114,6 +114,7 @@ class DoorLock:
             print("waiting for passcode: " + str(self.timeBeforeAttemdExpired))
             success, response = self.nfc.inDataExchange(GET_KEYID)
             print("success: "+str(success))
+            printBytes(GET_KEYID)
             if success:
                 print("response: ")
                 printBytes(response)
