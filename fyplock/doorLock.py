@@ -264,7 +264,7 @@ class DoorLock:
             displayString.append("Door Lock status: ")
             displayString.append("Unlocked")
             displayString.append("the door will lock in:")
-            displayString.append(str(self.timeBeforeLock))
+            displayString.append(str(self.time_before_lock))
             return displayString
         if self.failed_to_unlock:
             displayString.append("Door Lock status: ")
@@ -276,8 +276,8 @@ class DoorLock:
             if self.attempted_to_unlock:
                 displayString.append("~~~"+str(self.random_number)+"~~~")
                 displayString.append("Tap " + str(self.random_number) + " on the phone")
-                displayString.append("seconds left: " + str(self.timeBeforeAttemdExpired))
                 displayString.append("and tap nfc reader")
+                displayString.append("seconds left: " + str(self.timeBeforeAttemdExpired))
             else:
                 displayString.append("Door Lock status: ")
                 displayString.append("Locked")
