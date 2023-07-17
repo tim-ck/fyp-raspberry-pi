@@ -2,7 +2,7 @@ import keyboard
 from doorLock import DoorLock
 from os import system, name
 from display import Display
-
+from keyDB import KeyDB
 def clear_screen():
     if name == 'nt':
         _ = system('cls')
@@ -13,15 +13,23 @@ def clear_screen():
 class MainProgram:
     def __init__(self):
         print("Starting System...")
-        self.doorLock = DoorLock()
+        self.keyDB = KeyDB()
+        self.doorLock = DoorLock(self.keyDB)
         self.display = Display(self.doorLock)
         print("System started")
 
     def add_key(self):
         print("Add new key:")
-        print("Enter key id to your phone")
-        print("Enter id from ur phone")
-
+        print("=====================")
+        print("On your phone, open the app")
+        print("go to \"Key Management\" page")
+        print("click \"Generate Pin Code\"")
+        print("Enter the pin code here")
+        pinCode = input("Enter pin code: ")
+        keyid, pinFromLock = self.keyDB.dhKeyExchange_addKey(int(pinCode))
+        print("Enter key id and Pin to your phone")
+        print("key id:", keyid)
+        print("Pin:", pinFromLock)
         pass
 
 
