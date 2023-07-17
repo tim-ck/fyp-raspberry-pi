@@ -171,7 +171,6 @@ class DoorLock:
                         print("random_number: " + str(self.random_number))
                         printBytes(HMAC_SHA256(secret_key, self.random_number))
                         return
-                time.sleep(1.1)
         self.authenticate_failed("time expired")
 
     def start_a_fake_challenge(self):
