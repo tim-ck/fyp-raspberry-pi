@@ -23,14 +23,16 @@ class KeyDB:
 
     def dhKeyExchange_addKey(self, pinFromPhone):
         b = random.randint(1, 100)
+        print("b:", b)
         pinFromLock = (self.g ** b) % self.p
+        print("pinFromLock:", pinFromLock)
         secret_key = (pinFromPhone ** b) % self.p
+        print("secret_key:", secret_key)
         # generate a unique keyid with 9 digits
         keyid = random.randint(100000000, 999999999)
         while self.isKeyIDExist(keyid):
             keyid = random.randint(100000000, 999999999)
         self.keyList.append({"keyid": keyid, "secretKey": secret_key})
-        print("secret_key:", secret_key)
         self.saveKeyListAsJsonFile()
         return keyid, pinFromLock
 
