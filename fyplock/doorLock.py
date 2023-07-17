@@ -166,33 +166,6 @@ class DoorLock:
                         return
         self.authenticate_failed("time expired")
 
-    def start_a_fake_challenge(self):
-        for i in range(1, 6):
-            # print("sending random number to android app for " + str(i) + " time")
-            # //WRITE_RANDOM_NUMBER + random_number
-            apdu = WRITE_RANDOM_NUMBER + bytearray(self.random_number.to_bytes(1, byteorder='big'))
-            success, response = self.nfc.inDataExchange(apdu)
-            if (success):
-                # print("response: ")
-                # printBytes(response)
-                # print("responseLength: {:d}".format(len(response)))
-                if response == RESPONSE_OKAY:
-                    self.timeBeforeAttemdExpired = self.max_time_to_wait_for_passcode
-                    while self.timeBeforeAttemdExpired > 0:
-                        self.timeBeforeAttemdExpired -= 1
-                        # print("[fake]waiting for passcode: " + str(self.timeBeforeAttemdExpired))
-                        success, response = self.nfc.inDataExchange(GET_PASSCODE)
-                        # response length should be 4 bytes
-                        if success and len(response) == 4:
-                            # print("response: " + str(response))
-                            # print("responseLength: {:d}".format(len(response)))
-                            self.authenticate_failed("incorrect passcode")
-                            return
-                        time.sleep(1.1)
-                    self.authenticate_failed("time expired")
-                    return
-        self.authenticate_failed("failed to send challenge number")
-
     def generate_three_bytearray_with_random_order(self):
         first_byte = random.randint(0, 255)
         second_byte = random.randint(0, 255)
@@ -201,6 +174,35 @@ class DoorLock:
         # print("generate_three_bytearray_with_random_order: " + str(first_byte) + " " + str(second_byte) + " " + str(
         #     third_byte))
         return bytearray([first_byte, second_byte, third_byte])
+
+    def start_a_fake_challenge(self):
+        for i in range(1, 6):
+            # print("sending random number to android app for " + str(i) + " time")
+            # //WRITE_RANDOM_NUMBER + random_number
+            apdu = WRITE_RANDOM_NUMBER + self.generate_three_bytearray_with_random_order()
+            success, response = self.nfc.inDataExchange(apdu)
+            if (success):
+                # print("response: ")
+                # printBytes(response)
+                # print("responseLength: {:d}".format(len(response)))
+                if response == RESPONSE_OKAY:
+                    self.attempted_to_unlock = True
+                    self.timeBeforeAttemdExpired = self.max_time_to_wait_for_passcode
+                    while self.timeBeforeAttemdExpired > 0:
+                        self.timeBeforeAttemdExpired -= 1
+                        success = self.nfc.inListPassiveTarget()
+                        if success:
+                            success, response = self.nfc.inDataExchange(GET_PASSCODE)
+                            if success:
+                                if success and response == waiting_for_user_input:
+                                    time.sleep(1)
+                                    continue
+                                else:
+                                    self.authenticate_failed("incorrect passcode")
+                                    return
+                    self.authenticate_failed("time expired")
+                    return
+        self.authenticate_failed("failed to send challenge number")
 
     def start_a_challenge(self, secret_key):
         for i in range(1, 6):
