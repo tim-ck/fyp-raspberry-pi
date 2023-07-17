@@ -36,9 +36,13 @@ GET_PASSCODE = bytearray([0x00,  # CLA
                                         ])
 WRITE_RANDOM_NUMBER = bytearray([0x01, 0x2E])
 
+waiting_for_user_input = bytearray([0x00, 0x00, 0x00, 0x00])
+
+def intToBytes(number):
+    return number.to_bytes(4, "big")
 
 def HMAC_SHA256(key, message):
-    return hmac.new(key, message, hashlib.sha256).digest()
+    return hmac.new(intToBytes(key), intToBytes(message), hashlib.sha256).digest()
 
 
 class DoorLock:
@@ -107,6 +111,8 @@ class DoorLock:
             if success and len(response) == 4:
                 print("response: " + str(response))
                 print("responseLength: {:d}".format(len(response)))
+                if success and response == waiting_for_user_input:
+                    continue
                 if response == HMAC_SHA256(secret_key, self.random_number):
                     self.unlock()
                     return
@@ -153,7 +159,6 @@ class DoorLock:
     def start_a_challenge(self, secret_key):
         for i in range(1,6):
             print("sending random number to android app for " + str(i) + " time")
-            # //WRITE_RANDOM_NUMBER + random_number
             apdu = WRITE_RANDOM_NUMBER + self.generate_three_bytearray_with_random_order()
             print("apdu: " + str(apdu))
             success, response = self.nfc.inDataExchange(apdu)
