@@ -85,8 +85,8 @@ class DoorLock:
         self.error_message = ""
         self.random_number = -1
         self.maxTimeSendRandomNumber = 5
-        self.max_time_to_wait_for_passcode = 30
-        self.max_time_for_unlock = 30
+        self.max_time_to_wait_for_passcode = 15
+        self.max_time_for_unlock = 15
         self.timeBeforeAttemdExpired = 0
         self.time_before_lock = 0
 
