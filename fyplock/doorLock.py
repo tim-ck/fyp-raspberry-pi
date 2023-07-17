@@ -240,6 +240,9 @@ class DoorLock:
             self.reset_door_lock_status()
             success, response = self.nfc.readPassiveTargetID(0, timeout=250)
             if (success):
+                success = self.nfc.inListPassiveTarget()
+                if not success:
+                    continue
                 # RTD_TEXT
                 select_apdu = GET_KEYID
                 success, response = self.nfc.inDataExchange(select_apdu)
