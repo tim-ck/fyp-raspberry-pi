@@ -16,7 +16,7 @@ class Display:
         self.WIDTH = 128
         self.HEIGHT = 64
         self.BORDER = 5
-        self.LOOPTIME = 1.0
+        self.LOOPTIME = 0.2
         self.i2c = board.I2C()
         self.oled = adafruit_ssd1306.SSD1306_I2C(self.WIDTH, self.HEIGHT, self.i2c, addr=0x3C, reset=self.oled_reset)
         self.oled.fill(0)
