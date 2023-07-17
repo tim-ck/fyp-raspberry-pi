@@ -99,7 +99,7 @@ class DoorLock:
                                                                     (versiondata >> 16) & 0xFF,
                                                                     (versiondata >> 8) & 0xFF))
         self.nfc.SAMConfig()
-        self.nfc.setPassiveActivationRetries(1000)
+        self.nfc.setPassiveActivationRetries(900)
         print("Starting NFC card detection thread...")
         self.nfc_thread = threading.Thread(target=self.detect_android_nfc_key)
         self.nfc_thread.start()
@@ -149,7 +149,7 @@ class DoorLock:
         self.timeBeforeAttemdExpired = self.max_time_to_wait_for_passcode
         correctAnswer = HMAC_SHA256(secret_key, self.random_number)
         while self.timeBeforeAttemdExpired > 0:
-            self.timeBeforeAttemdExpired -= 2
+            self.timeBeforeAttemdExpired -= 1
             print("waiting for passcode: " + str(self.timeBeforeAttemdExpired))
             success = self.nfc.inListPassiveTarget()
             if success:
