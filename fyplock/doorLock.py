@@ -126,6 +126,10 @@ class DoorLock:
                     return
                 else:
                     self.authenticate_failed("incorrect passcode")
+                    print("expected: ")
+                    print("secret_key: " + str(secret_key))
+                    print("random_number: " + str(self.random_number))
+                    printBytes(HMAC_SHA256(secret_key, self.random_number))
                     return
             time.sleep(1.5)
         self.authenticate_failed("time expired")
