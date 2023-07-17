@@ -121,9 +121,7 @@ class DoorLock:
             self.time_before_lock -= 1
             success = self.nfc.inListPassiveTarget()
             if success:
-                success, response = self.nfc.inDataExchange(unlock_success)
-                if success and response == RESPONSE_OKAY:
-                    return
+                self.nfc.inDataExchange(unlock_success)
         self.lock()
 
     def authenticate_failed(self, error_message):
@@ -132,9 +130,7 @@ class DoorLock:
             self.error_message = error_message
             success = self.nfc.inListPassiveTarget()
             if success:
-                success, response = self.nfc.inDataExchange(unlock_success)
-                if success and response == RESPONSE_OKAY:
-                    return
+                self.nfc.inDataExchange(unlock_success)
         self.reset_door_lock_status()
 
     def wait_for_passcode(self, secret_key):
