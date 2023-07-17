@@ -109,6 +109,19 @@ class DoorLock:
         self.failed_to_unlock = False
         self.error_message = ""
 
+    def sendUnlockStatusToAndroid(self, isUnlock):
+        if isUnlock:
+            cmd = unlock_success
+        else:
+            cmd = unlock_failed
+        for i in range(5):
+            success = self.nfc.inListPassiveTarget()
+            if success:
+                success, response = self.nfc.inDataExchange(cmd)
+                if success and response == RESPONSE_OKAY:
+                    return
+            time.sleep(1.1)
+
     def lock(self):
         self.locked = True
         pass
@@ -116,18 +129,14 @@ class DoorLock:
     def unlock(self):
         self.locked = False
         self.time_before_lock = self.max_time_for_unlock
+        threading.Thread(target=self.sendUnlockStatusToAndroid(True)).start()
         while (self.time_before_lock > 0):
             self.time_before_lock -= 1
             time.sleep(1.1)
         self.lock()
 
     def authenticate_failed(self, error_message):
-        success = self.nfc.inListPassiveTarget()
-        if success:
-            success, response = self.nfc.inDataExchange(unlock_failed)
-            if success:
-                print("unlock_success response: ")
-                printBytes(response)
+        threading.Thread(target=self.sendUnlockStatusToAndroid(False)).start()
         for i in range(5):
             self.failed_to_unlock = True
             self.error_message = error_message
