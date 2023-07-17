@@ -99,7 +99,7 @@ class DoorLock:
                                                                     (versiondata >> 16) & 0xFF,
                                                                     (versiondata >> 8) & 0xFF))
         self.nfc.SAMConfig()
-        self.nfc.setPassiveActivationRetries(200)
+        # self.nfc.setPassiveActivationRetries(200)
         print("Starting NFC card detection thread...")
         self.nfc_thread = threading.Thread(target=self.detect_android_nfc_key)
         self.nfc_thread.start()
@@ -110,19 +110,6 @@ class DoorLock:
         self.failed_to_unlock = False
         self.error_message = ""
 
-    def sendUnlockStatusToAndroid(self, isUnlock):
-        if isUnlock:
-            cmd = unlock_success
-        else:
-            cmd = unlock_failed
-        for i in range(5):
-            success = self.nfc.inListPassiveTarget()
-            if success:
-                success, response = self.nfc.inDataExchange(cmd)
-                if success and response == RESPONSE_OKAY:
-                    return
-            time.sleep(1.1)
-
     def lock(self):
         self.locked = True
         pass
@@ -130,18 +117,24 @@ class DoorLock:
     def unlock(self):
         self.locked = False
         self.time_before_lock = self.max_time_for_unlock
-        threading.Thread(target=self.sendUnlockStatusToAndroid(True)).start()
         while (self.time_before_lock > 0):
             self.time_before_lock -= 1
-            time.sleep(1.1)
+            success = self.nfc.inListPassiveTarget()
+            if success:
+                success, response = self.nfc.inDataExchange(unlock_success)
+                if success and response == RESPONSE_OKAY:
+                    return
         self.lock()
 
     def authenticate_failed(self, error_message):
-        threading.Thread(target=self.sendUnlockStatusToAndroid(False)).start()
         for i in range(5):
             self.failed_to_unlock = True
             self.error_message = error_message
-            time.sleep(1.1)
+            success = self.nfc.inListPassiveTarget()
+            if success:
+                success, response = self.nfc.inDataExchange(unlock_success)
+                if success and response == RESPONSE_OKAY:
+                    return
         self.reset_door_lock_status()
 
     def wait_for_passcode(self, secret_key):
