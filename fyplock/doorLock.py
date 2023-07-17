@@ -274,10 +274,10 @@ class DoorLock:
             return displayString
         if self.locked:
             if self.attempted_to_unlock:
-                displayString.append(str(self.random_number))
-                displayString.append("Tap " + str(self.random_number) + " on your phone")
+                displayString.append("~~~"+str(self.random_number)+"~~~")
+                displayString.append("Tap " + str(self.random_number) + " on the phone")
                 displayString.append("seconds left: " + str(self.timeBeforeAttemdExpired))
-                displayString.append("and tap the nfc reader to authenticat")
+                displayString.append("and tap nfc reader")
             else:
                 displayString.append("Door Lock status: ")
                 displayString.append("Locked")
