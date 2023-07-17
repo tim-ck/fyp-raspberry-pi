@@ -199,6 +199,7 @@ class DoorLock:
                                     continue
                                 else:
                                     self.authenticate_failed("incorrect passcode")
+                                    time.sleep(1)
                                     return
                     self.authenticate_failed("time expired")
                     return
