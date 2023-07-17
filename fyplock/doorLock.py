@@ -145,10 +145,10 @@ class DoorLock:
 
     def wait_for_passcode(self, secret_key):
         self.attempted_to_unlock = True
-        self.timeBeforeAttemdExpired = self.max_time_to_wait_for_passcode / 2
+        self.timeBeforeAttemdExpired = self.max_time_to_wait_for_passcode
         correctAnswer = HMAC_SHA256(secret_key, self.random_number)
         while self.timeBeforeAttemdExpired > 0:
-            self.timeBeforeAttemdExpired -= 1
+            self.timeBeforeAttemdExpired -= 2
             print("waiting for passcode: " + str(self.timeBeforeAttemdExpired))
             success = self.nfc.inListPassiveTarget()
             if success:
