@@ -218,14 +218,15 @@ class DoorLock:
         self.authenticate_failed("failed to send challenge number")
 
     def authenticate(self, keyID):
+        printBytes(keyID)
         is_key_exist, secret_key = self.keyDB.getSecretKeyByID(bytesToInt(keyID))
         self.random_number = random.randint(0, 255)
         self.locked = True
         if not is_key_exist:
-            # print("key not exist")
+            print("key not exist")
             self.start_a_fake_challenge()
         else:
-            # print("key exist")
+            print("key exist")
             self.start_a_challenge(secret_key)
 
     def detect_android_nfc_key(self):
