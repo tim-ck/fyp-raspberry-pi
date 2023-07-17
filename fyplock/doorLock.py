@@ -119,14 +119,14 @@ class DoorLock:
                 print("response: ")
                 printBytes(response)
                 print("responseLength: {:d}".format(len(response)))
-                if success and response == waiting_for_user_input:
-                    continue
-                if response == HMAC_SHA256(secret_key, self.random_number):
-                    self.unlock()
-                    return
-                else:
-                    self.authenticate_failed("incorrect passcode")
-                    return
+                # if success and response == waiting_for_user_input:
+                #     continue
+                # if response == HMAC_SHA256(secret_key, self.random_number):
+                #     self.unlock()
+                #     return
+                # else:
+                #     self.authenticate_failed("incorrect passcode")
+                #     return
             time.sleep(1.5)
         self.authenticate_failed("time expired")
 
