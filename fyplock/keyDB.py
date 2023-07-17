@@ -47,7 +47,7 @@ class KeyDB:
                 return True
         return False
 
-    def getSecretKeyByID(self, keyid, A):
+    def getSecretKeyByID(self, keyid):
         for key in self.keyList:
             if key["keyid"] == keyid:
                 return True, key["secretKey"]
