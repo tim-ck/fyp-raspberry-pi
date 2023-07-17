@@ -114,12 +114,12 @@ class DoorLock:
             print("waiting for passcode: " + str(self.timeBeforeAttemdExpired))
             success, response = self.nfc.inDataExchange(GET_PASSCODE)
             print("success: "+str(success))
-            printBytes(GET_KEYID)
             if success:
                 print("response: ")
                 printBytes(response)
                 print("responseLength: {:d}".format(len(response)))
                 if success and response == waiting_for_user_input:
+                    time.sleep(1.5)
                     continue
                 if response == HMAC_SHA256(secret_key, self.random_number):
                     self.unlock()
