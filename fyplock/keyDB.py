@@ -1,3 +1,5 @@
+import json
+
 from numpy import random
 
 
@@ -19,6 +21,8 @@ class KeyDB:
     g = 5
 
     def __init__(self):
+        with open("keyList.json", "r") as f:
+            self.keyList = json.load(f)
         pass
 
     def dhKeyExchange_addKey(self, pinFromPhone):
@@ -48,6 +52,8 @@ class KeyDB:
         return False
 
     def getSecretKeyByID(self, keyid):
+        print("keyid:", keyid)
+        print("keyList:", self.keyList)
         for key in self.keyList:
             if key["keyid"] == keyid:
                 return True, key["secretKey"]
