@@ -44,6 +44,11 @@ def intToBytes(number):
 def HMAC_SHA256(key, message):
     return hmac.new(intToBytes(key), intToBytes(message), hashlib.sha256).digest()
 
+def printBytes(bytes):
+#     print as 0x..
+    for byte in bytes:
+        print(hex(byte), end=" ")
+    print()
 
 class DoorLock:
 
@@ -109,7 +114,8 @@ class DoorLock:
             print("waiting for passcode: " + str(self.timeBeforeAttemdExpired))
             success, response = self.nfc.inDataExchange(GET_PASSCODE)
             if success:
-                print("response: " + str(response))
+                print("response: ")
+                printBytes(response)
                 print("responseLength: {:d}".format(len(response)))
                 if success and response == waiting_for_user_input:
                     continue
@@ -129,7 +135,8 @@ class DoorLock:
             apdu = WRITE_RANDOM_NUMBER + bytearray(self.random_number.to_bytes(1, byteorder='big'))
             success, response = self.nfc.inDataExchange(apdu)
             if (success):
-                print("response: " + str(response))
+                print("response: ")
+                printBytes(response)
                 print("responseLength: {:d}".format(len(response)))
                 if response == RESPONSE_OKAY:
                     self.timeBeforeAttemdExpired = self.max_time_to_wait_for_passcode
@@ -164,7 +171,8 @@ class DoorLock:
             success, response = self.nfc.inDataExchange(apdu)
             if (success):
                 print("responseLength: {:d}".format(len(response)))
-                print("response: " + str(response))
+                print("response: " )
+                printBytes(response)
                 if response == RESPONSE_OKAY:
                     self.wait_for_passcode(secret_key)
                     return
