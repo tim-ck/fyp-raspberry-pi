@@ -115,7 +115,7 @@ class DoorLock:
         else:
             cmd = unlock_failed
         for i in range(5):
-            success = self.nfc.readPassiveTargetID(0, timeout=100)
+            success = self.nfc.readPassiveTargetID(0, timeout=500)
             if success:
                 success, response = self.nfc.inDataExchange(cmd)
                 if success and response == RESPONSE_OKAY:
@@ -238,7 +238,7 @@ class DoorLock:
         print("detecting android nfc key...")
         while True:
             self.reset_door_lock_status()
-            success, response = self.nfc.readPassiveTargetID(0, timeout=100)
+            success, response = self.nfc.readPassiveTargetID(0, timeout=500)
             if (success):
                 # RTD_TEXT
                 select_apdu = GET_KEYID
