@@ -96,14 +96,14 @@ class DoorLock:
         self.time_before_lock = self.max_time_for_unlock
         while(self.time_before_lock > 0):
             self.time_before_lock -= 1
-            time.sleep(1.5)
+            time.sleep(1.1)
         self.lock()
 
     def authenticate_failed(self, error_message):
         for i in range(5):
             self.failed_to_unlock = True
             self.error_message = error_message
-            time.sleep(1.5)
+            time.sleep(1.1)
         self.reset_door_lock_status()
 
     def wait_for_passcode(self, secret_key):
@@ -119,7 +119,8 @@ class DoorLock:
                 printBytes(response)
                 print("responseLength: {:d}".format(len(response)))
                 if success and response == waiting_for_user_input:
-                    time.sleep(1.5)
+                    time.sleep(1.1
+    )
                     continue
                 if response == HMAC_SHA256(secret_key, self.random_number):
                     self.unlock()
@@ -131,7 +132,7 @@ class DoorLock:
                     print("random_number: " + str(self.random_number))
                     printBytes(HMAC_SHA256(secret_key, self.random_number))
                     return
-            time.sleep(1.5)
+            time.sleep(1.1)
         self.authenticate_failed("time expired")
 
     def start_a_fake_challenge(self):
@@ -156,7 +157,8 @@ class DoorLock:
                             print("responseLength: {:d}".format(len(response)))
                             self.authenticate_failed("incorrect passcode")
                             return
-                        time.sleep(1.5)
+                        time.sleep(1.1
+        )
                     self.authenticate_failed("time expired")
                     return
         self.authenticate_failed("failed to send challenge number")
@@ -215,7 +217,7 @@ class DoorLock:
                     print("Failed sending SELECT AID")
             else:
                 print("Didn't find anything!")
-            time.sleep(1.5)
+            time.sleep(1.1)
 
     # status list: locked, failed_to_unlock, attempted_to_unlock
     def getStatusString(self):
