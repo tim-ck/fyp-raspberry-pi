@@ -117,6 +117,9 @@ class DoorLock:
         for i in range(5):
             success = self.nfc.readPassiveTargetID(0, timeout=250)
             if success:
+                success = self.nfc.inListPassiveTarget()
+                if not success:
+                    continue
                 success, response = self.nfc.inDataExchange(cmd)
                 if success and response == RESPONSE_OKAY:
                     return
@@ -151,6 +154,9 @@ class DoorLock:
             print("waiting for passcode: " + str(self.timeBeforeAttemdExpired))
             success, response = self.nfc.readPassiveTargetID(0, timeout=250)
             if success:
+                success = self.nfc.inListPassiveTarget()
+                if not success:
+                    continue
                 success, response = self.nfc.inDataExchange(GET_PASSCODE)
                 print("success: " + str(success))
                 if success:
