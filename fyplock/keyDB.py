@@ -21,9 +21,13 @@ class KeyDB:
     g = 5
 
     def __init__(self):
-        with open("keyList.json", "r") as f:
-            self.keyList = json.load(f)
-        pass
+        # if keyList.json does not exist, create one
+        try:
+            with open("keyList.json", "r") as f:
+                self.keyList = json.load(f)
+        except FileNotFoundError:
+            with open("keyList.json", "w") as f:
+                json.dump(self.keyList, f)
 
     def dhKeyExchange_addKey(self, pinFromPhone):
         A = pinFromPhone
