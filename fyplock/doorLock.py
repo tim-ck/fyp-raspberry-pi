@@ -215,9 +215,10 @@ class DoorLock:
                     self.authenticate(keyID)
                 else:
                     print("Failed sending SELECT AID")
+                    time.sleep(1.1)
             else:
                 print("Didn't find anything!")
-            time.sleep(1.1)
+
 
     # status list: locked, failed_to_unlock, attempted_to_unlock
     def getStatusString(self):
