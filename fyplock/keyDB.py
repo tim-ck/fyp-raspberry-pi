@@ -43,7 +43,7 @@ class KeyDB:
 
     def saveKeyListAsJsonFile(self):
         with open("keyList.json", "w") as f:
-            f.write(str(self.keyList))
+            json.dump(self.keyList, f)
 
     def isKeyIDExist(self, keyid):
         for key in self.keyList:
