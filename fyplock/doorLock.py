@@ -148,7 +148,7 @@ class DoorLock:
                         time.sleep(1.1)
                         continue
                     if response == HMAC_SHA256(secret_key, self.random_number):
-                        self.nfc.inDataExchange(unlock_success)
+                        success, response = self.nfc.inDataExchange(unlock_success)
                         print("unlock: " + unlock_success)
                         self.unlock()
                         return
