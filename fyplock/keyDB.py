@@ -22,10 +22,11 @@ class KeyDB:
         pass
 
     def dhKeyExchange_addKey(self, pinFromPhone):
-        b = random.randint(1, 100)
+        A = pinFromPhone
+        b = random.randint(1, 11)
         print("b:", b)
         pinFromLock = (self.g ** b) % self.p
-        print("pinFromLock:", pinFromLock)
+        print("pinFromPhone:", pinFromPhone)
         secret_key = (pinFromPhone ** b) % self.p
         print("secret_key:", secret_key)
         # generate a unique keyid with 9 digits
