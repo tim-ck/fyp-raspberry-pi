@@ -245,10 +245,8 @@ class DoorLock:
         self.random_number = random.randint(0, 255)
         self.locked = True
         if not is_key_exist:
-            print("key not exist")
             self.start_a_fake_challenge()
         else:
-            print("key exist")
             self.start_a_challenge(secret_key)
 
     def detect_android_nfc_key(self):
@@ -263,8 +261,6 @@ class DoorLock:
                 success, response = self.nfc.inDataExchange(select_apdu)
                 if (success):
                     print(select_apdu)
-                    print("responseLength: Apdu {:d}", len(response))
-                    print("response: " + str(response))
                     keyID = response[0:4]
                     self.authenticate(keyID)
                 else:
