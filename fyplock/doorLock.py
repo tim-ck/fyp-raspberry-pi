@@ -236,6 +236,7 @@ class DoorLock:
         # print("detecting android nfc key...")
         while True:
             self.reset_door_lock_status()
+            time.sleep(0.1)
             success = self.nfc.inListPassiveTarget()
             if (success):
                 # RTD_TEXT
