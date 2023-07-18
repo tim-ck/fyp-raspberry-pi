@@ -292,7 +292,7 @@ class DoorLock:
                     print("Failed sending SELECT AID")
                     time.sleep(2)
             else:
-                print("Didn't find anything!")
+                # print("Didn't find anything!")
                 time.sleep(0.5)
 
     # status list: locked, failed_to_unlock, attempted_to_unlock
