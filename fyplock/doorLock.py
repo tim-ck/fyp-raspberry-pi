@@ -103,7 +103,7 @@ class DoorLock:
         #                                                             (versiondata >> 8) & 0xFF))
         self.nfc.SAMConfig()
         self.nfc.setPassiveActivationRetries(190)
-        # print("Starting NFC card detection thread...")
+        print("Starting NFC card detection thread...")
         self.nfc_thread = threading.Thread(target=self.detect_android_nfc_key)
         self.nfc_thread.start()
 
@@ -233,26 +233,25 @@ class DoorLock:
             self.start_a_challenge(secret_key)
 
     def detect_android_nfc_key(self):
-        # print("detecting android nfc key...")
+        print("detecting android nfc key...")
         while True:
             self.reset_door_lock_status()
-            time.sleep(0.1)
             success = self.nfc.inListPassiveTarget()
             if (success):
                 # RTD_TEXT
                 select_apdu = GET_KEYID
                 success, response = self.nfc.inDataExchange(select_apdu)
                 if (success):
-                    # print(select_apdu)
-                    # print("responseLength: Apdu {:d}", len(response))
-                    # print("response: " + str(response))
+                    print(select_apdu)
+                    print("responseLength: Apdu {:d}", len(response))
+                    print("response: " + str(response))
                     keyID = response[0:4]
                     self.authenticate(keyID)
                 else:
-                    # print("Failed sending SELECT AID")
+                    print("Failed sending SELECT AID")
                     time.sleep(1.1)
-            # else:
-                # print("Didn't find anything!")
+            else:
+                print("Didn't find anything!")
 
     # status list: locked, failed_to_unlock, attempted_to_unlock
     def getStatusString(self):
