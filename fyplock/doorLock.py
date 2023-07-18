@@ -102,7 +102,7 @@ class DoorLock:
         #                                                             (versiondata >> 16) & 0xFF,
         #                                                             (versiondata >> 8) & 0xFF))
         self.nfc.SAMConfig()
-        self.nfc.setPassiveActivationRetries(190)
+        self.nfc.setPassiveActivationRetries(80)
         print("Starting NFC card detection thread...")
         self.nfc_thread = threading.Thread(target=self.detect_android_nfc_key)
         self.nfc_thread.start()
@@ -125,6 +125,8 @@ class DoorLock:
             success = self.nfc.inListPassiveTarget()
             if success:
                 self.nfc.inDataExchange(unlock_success)
+            else:
+                time.sleep(0.5)
         self.lock()
 
     def authenticate_failed(self, error_message):
@@ -134,6 +136,8 @@ class DoorLock:
             success = self.nfc.inListPassiveTarget()
             if success:
                 self.nfc.inDataExchange(unlock_success)
+            else:
+                time.sleep(0.5)
         self.reset_door_lock_status()
 
     def wait_for_passcode(self, secret_key):
@@ -164,6 +168,8 @@ class DoorLock:
                         # print("random_number: " + str(self.random_number))
                         # printBytes(HMAC_SHA256(secret_key, self.random_number))
                         return
+            else:
+                time.sleep(0.5)
         self.authenticate_failed("time expired")
 
     def generate_three_bytearray_with_random_order(self):
@@ -201,6 +207,8 @@ class DoorLock:
                                     self.authenticate_failed("incorrect passcode")
                                     time.sleep(1)
                                     return
+                        else:
+                            time.sleep(0.5)
                     self.authenticate_failed("time expired")
                     return
         self.authenticate_failed("failed to send challenge number")
@@ -249,9 +257,10 @@ class DoorLock:
                     self.authenticate(keyID)
                 else:
                     print("Failed sending SELECT AID")
-                    time.sleep(1.1)
+                    time.sleep(2)
             else:
                 print("Didn't find anything!")
+                time.sleep(0.5)
 
     # status list: locked, failed_to_unlock, attempted_to_unlock
     def getStatusString(self):
