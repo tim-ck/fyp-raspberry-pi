@@ -102,7 +102,7 @@ class DoorLock:
         #                                                             (versiondata >> 16) & 0xFF,
         #                                                             (versiondata >> 8) & 0xFF))
         self.nfc.SAMConfig()
-        self.nfc.setPassiveActivationRetries(180)
+        self.nfc.setPassiveActivationRetries(190)
         # print("Starting NFC card detection thread...")
         self.nfc_thread = threading.Thread(target=self.detect_android_nfc_key)
         self.nfc_thread.start()
