@@ -31,7 +31,7 @@ class KeyDB:
 
     def dhKeyExchange_addKey(self, pinFromPhone):
         A = pinFromPhone
-        b = random.randint(1, 11)
+        b = random.randint(1, 255)
         print("b:", b)
         pinFromLock = (self.g ** b) % self.p
         print("pinFromPhone:", pinFromPhone)
