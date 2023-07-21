@@ -32,11 +32,8 @@ class KeyDB:
     def dhKeyExchange_addKey(self, pinFromPhone):
         A = pinFromPhone
         b = random.randint(1, 255)
-        print("b:", b)
         pinFromLock = (self.g ** b) % self.p
-        print("pinFromPhone:", pinFromPhone)
         secret_key = (pinFromPhone ** b) % self.p
-        print("secret_key:", secret_key)
         # generate a unique keyid with 9 digits
         keyid = random.randint(100000000, 999999999)
         while self.isKeyIDExist(keyid):
@@ -56,8 +53,6 @@ class KeyDB:
         return False
 
     def getSecretKeyByID(self, keyid):
-        print("keyid:", keyid)
-        print("keyList:", self.keyList)
         for key in self.keyList:
             if key["keyid"] == keyid:
                 return True, key["secretKey"]
