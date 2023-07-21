@@ -40,10 +40,10 @@ class Display:
         thread.start()
     def display_loop(self):
         while True:
-            clear_screen()
-            doorLockStatusString = self.doorLock.getStatusString()
-            for i in range(len(doorLockStatusString)):
-                print(doorLockStatusString[i])
+            # clear_screen()
+            # doorLockStatusString = self.doorLock.getStatusString()
+            # for i in range(len(doorLockStatusString)):
+            #     print(doorLockStatusString[i])
             time.sleep(0.5)
             #
             # self.draw.rectangle((0, 0, self.oled.width, self.oled.height), outline=0, fill=0)
