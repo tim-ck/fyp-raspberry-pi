@@ -128,7 +128,7 @@ class DoorLock:
         self.time_before_lock = self.max_time_for_unlock
         while (self.time_before_lock > 0):
             self.time_before_lock -= 1
-            time.sleep(0.5)
+            time.sleep(1)
             try:
                 success = self.nfc.inListPassiveTarget()
                 if success:
@@ -145,13 +145,13 @@ class DoorLock:
         for i in range(5):
             self.failed_to_unlock = True
             self.error_message = error_message
-            time.sleep(0.5)
+            time.sleep(1)
             try:
                 success = self.nfc.inListPassiveTarget()
                 if success:
                     self.nfc.inDataExchange(unlock_success)
                 else:
-                    time.sleep(0.5)
+                    time.sleep(1)
             except:
                 self.restartNfcReader()
 
@@ -165,7 +165,7 @@ class DoorLock:
         while self.timeBeforeAttemdExpired > 0:
             self.timeBeforeAttemdExpired -= 1
             # print("waiting for passcode: " + str(self.timeBeforeAttemdExpired))
-            time.sleep(0.5)
+            time.sleep(1)
             try:
                 success = self.nfc.inListPassiveTarget()
                 if success:
@@ -220,7 +220,7 @@ class DoorLock:
                     self.timeBeforeAttemdExpired = self.max_time_to_wait_for_passcode
                     while self.timeBeforeAttemdExpired > 0:
                         self.timeBeforeAttemdExpired -= 1
-                        time.sleep(0.5)
+                        time.sleep(1)
                         try:
                             success = self.nfc.inListPassiveTarget()
                             if success:
@@ -271,7 +271,7 @@ class DoorLock:
         print("detecting android nfc key...")
         while True:
             self.reset_door_lock_status()
-            time.sleep(0.5)
+            time.sleep(1)
             try:
                 success = self.nfc.inListPassiveTarget()
                 if (success):
