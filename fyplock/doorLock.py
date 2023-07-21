@@ -89,7 +89,6 @@ class DoorLock:
         self.max_time_for_unlock = 15
         self.timeBeforeAttemdExpired = 0
         self.time_before_lock = 0
-
         # print("Setting up NFC reader...")
         self.PN532_I2C = Pn532I2c(1)
         self.nfc = Pn532(self.PN532_I2C)
