@@ -40,7 +40,7 @@ class Display:
         thread.start()
     def display_loop(self):
         while True:
-            clear_screen()
+            # clear_screen()
             doorLockStatusString = self.doorLock.getStatusString()
             for i in range(len(doorLockStatusString)):
                 print(doorLockStatusString[i])
