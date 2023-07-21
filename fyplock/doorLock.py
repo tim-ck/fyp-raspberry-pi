@@ -96,11 +96,11 @@ class DoorLock:
         self.nfc.begin()
         versiondata = self.nfc.getFirmwareVersion()
         if not versiondata:
-            # print("Didn't find PN53x board")
+            print("Didn't find PN53x board")
             raise RuntimeError("Didn't find PN53x board")
-        # print("Found chip PN5 {:#x} Firmware ver. {:d}.{:d}".format((versiondata >> 24) & 0xFF,
-        #                                                             (versiondata >> 16) & 0xFF,
-        #                                                             (versiondata >> 8) & 0xFF))
+        print("Found chip PN5 {:#x} Firmware ver. {:d}.{:d}".format((versiondata >> 24) & 0xFF,
+                                                                    (versiondata >> 16) & 0xFF,
+                                                                    (versiondata >> 8) & 0xFF))
         self.nfc.SAMConfig()
         # self.nfc.setPassiveActivationRetries(80)
         print("Starting NFC card detection thread...")
