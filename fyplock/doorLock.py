@@ -107,6 +107,10 @@ class DoorLock:
         self.nfc_thread = threading.Thread(target=self.detect_android_nfc_key)
         self.nfc_thread.start()
 
+    def restartNfcReader(self):
+        time.sleep(1)
+
+
     def reset_door_lock_status(self):
         self.locked = True
         self.attempted_to_unlock = False
@@ -123,11 +127,14 @@ class DoorLock:
         while (self.time_before_lock > 0):
             self.time_before_lock -= 1
             time.sleep(0.5)
-            success = self.nfc.inListPassiveTarget()
-            if success:
-                self.nfc.inDataExchange(unlock_success)
-            else:
-                time.sleep(0.5)
+            try:
+                success = self.nfc.inListPassiveTarget()
+                if success:
+                    self.nfc.inDataExchange(unlock_success)
+                else:
+                    time.sleep(0.5)
+            except:
+                self.restartNfcReader()
 
         self.lock()
 
@@ -137,11 +144,14 @@ class DoorLock:
             self.failed_to_unlock = True
             self.error_message = error_message
             time.sleep(0.5)
-            success = self.nfc.inListPassiveTarget()
-            if success:
-                self.nfc.inDataExchange(unlock_success)
-            else:
-                time.sleep(0.5)
+            try:
+                success = self.nfc.inListPassiveTarget()
+                if success:
+                    self.nfc.inDataExchange(unlock_success)
+                else:
+                    time.sleep(0.5)
+            except:
+                self.restartNfcReader()
 
 
         self.reset_door_lock_status()
@@ -154,29 +164,32 @@ class DoorLock:
             self.timeBeforeAttemdExpired -= 1
             # print("waiting for passcode: " + str(self.timeBeforeAttemdExpired))
             time.sleep(0.5)
-            success = self.nfc.inListPassiveTarget()
-            if success:
-                success, response = self.nfc.inDataExchange(GET_PASSCODE)
-                # print("success: " + str(success))
+            try:
+                success = self.nfc.inListPassiveTarget()
                 if success:
-                    # print("response: ")
-                    # printBytes(response)
-                    # print("responseLength: {:d}".format(len(response)))
-                    if success and response == waiting_for_user_input:
-                        time.sleep(1)
-                        continue
-                    if response == correctAnswer:
-                        self.unlock()
-                        return
-                    else:
-                        self.authenticate_failed("incorrect passcode")
-                        # print("expected: ")
-                        # print("secret_key: " + str(secret_key))
-                        # print("random_number: " + str(self.random_number))
-                        # printBytes(HMAC_SHA256(secret_key, self.random_number))
-                        return
-            else:
-                time.sleep(0.5)
+                    success, response = self.nfc.inDataExchange(GET_PASSCODE)
+                    # print("success: " + str(success))
+                    if success:
+                        # print("response: ")
+                        # printBytes(response)
+                        # print("responseLength: {:d}".format(len(response)))
+                        if success and response == waiting_for_user_input:
+                            time.sleep(1)
+                            continue
+                        if response == correctAnswer:
+                            self.unlock()
+                            return
+                        else:
+                            self.authenticate_failed("incorrect passcode")
+                            # print("expected: ")
+                            # print("secret_key: " + str(secret_key))
+                            # print("random_number: " + str(self.random_number))
+                            # printBytes(HMAC_SHA256(secret_key, self.random_number))
+                            return
+                else:
+                    time.sleep(0.5)
+            except:
+                self.restartNfcReader()
 
         self.authenticate_failed("time expired")
 
@@ -206,19 +219,22 @@ class DoorLock:
                     while self.timeBeforeAttemdExpired > 0:
                         self.timeBeforeAttemdExpired -= 1
                         time.sleep(0.5)
-                        success = self.nfc.inListPassiveTarget()
-                        if success:
-                            success, response = self.nfc.inDataExchange(GET_PASSCODE)
+                        try:
+                            success = self.nfc.inListPassiveTarget()
                             if success:
-                                if success and response == waiting_for_user_input:
-                                    time.sleep(1)
-                                    continue
-                                else:
-                                    self.authenticate_failed("incorrect passcode")
-                                    time.sleep(1)
-                                    return
-                        else:
-                            time.sleep(0.5)
+                                success, response = self.nfc.inDataExchange(GET_PASSCODE)
+                                if success:
+                                    if success and response == waiting_for_user_input:
+                                        time.sleep(1)
+                                        continue
+                                    else:
+                                        self.authenticate_failed("incorrect passcode")
+                                        time.sleep(1)
+                                        return
+                            else:
+                                time.sleep(0.5)
+                        except:
+                            self.restartNfcReader()
                     self.authenticate_failed("time expired")
                     return
         self.authenticate_failed("failed to send challenge number")
@@ -254,21 +270,24 @@ class DoorLock:
         while True:
             self.reset_door_lock_status()
             time.sleep(0.5)
-            success = self.nfc.inListPassiveTarget()
-            if (success):
-                # RTD_TEXT
-                select_apdu = GET_KEYID
-                success, response = self.nfc.inDataExchange(select_apdu)
+            try:
+                success = self.nfc.inListPassiveTarget()
                 if (success):
-                    print(select_apdu)
-                    keyID = response[0:4]
-                    self.authenticate(keyID)
+                    # RTD_TEXT
+                    select_apdu = GET_KEYID
+                    success, response = self.nfc.inDataExchange(select_apdu)
+                    if (success):
+                        print(select_apdu)
+                        keyID = response[0:4]
+                        self.authenticate(keyID)
+                    else:
+                        print("Failed sending SELECT AID")
+                        time.sleep(2)
                 else:
-                    print("Failed sending SELECT AID")
-                    time.sleep(2)
-            else:
-                # print("Didn't find anything!")
-                time.sleep(0.5)
+                    # print("Didn't find anything!")
+                    time.sleep(0.5)
+            except:
+                self.restartNfcReader()
 
     # status list: locked, failed_to_unlock, attempted_to_unlock
     def getStatusString(self):
