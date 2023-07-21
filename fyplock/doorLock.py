@@ -206,7 +206,7 @@ class DoorLock:
     def start_a_fake_challenge(self):
         for i in range(1, 6):
             # print("sending random number to android app for " + str(i) + " time")
-            # //WRITE_RANDOM_NUMBER + random_number
+            # WRITE_RANDOM_NUMBER + random_number
             apdu = WRITE_RANDOM_NUMBER + self.generate_three_bytearray_with_random_order()
             time.sleep(0.5)
             success, response = self.nfc.inDataExchange(apdu)
@@ -285,7 +285,7 @@ class DoorLock:
                         print("Failed sending SELECT AID")
                         time.sleep(2)
                 else:
-                    # print("Didn't find anything!")
+                    print("Didn't find anything!")
                     time.sleep(0.5)
             except:
                 self.restartNfcReader()
