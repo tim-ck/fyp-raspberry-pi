@@ -1,16 +1,25 @@
 import threading
 import time
+from os import system, name
+
 import board
 import busio
 import digitalio
 from PIL import Image, ImageDraw, ImageFont
 import adafruit_ssd1306
 import subprocess
-
+def clear_screen():
+    if name == 'nt':
+        _ = system('cls')
+    else:
+        _ = system('clear')
 
 class Display:
     def __init__(self, doorLock):
         print("Starting OLED display...")
+        thread = threading.Thread(target=self.display_loop)
+        thread.start()
+        # clear
         # self.doorLock = doorLock
         # self.oled_reset = digitalio.DigitalInOut(board.D4)
         # self.WIDTH = 128
@@ -33,13 +42,19 @@ class Display:
         # thread.start()
     def display_loop(self):
         while True:
-            self.draw.rectangle((0, 0, self.oled.width, self.oled.height), outline=0, fill=0)
+            clear_screen()
             doorLockStatusString = self.doorLock.getStatusString()
             for i in range(len(doorLockStatusString)):
-                self.draw.text((0, 16*i), doorLockStatusString[i], font=self.font, fill=255)
-            self.oled.image(self.image)
-            self.oled.show()
-            time.sleep(self.LOOPTIME)
+                print(doorLockStatusString[i])
+            time.sleep(0.5)
+            #
+            # self.draw.rectangle((0, 0, self.oled.width, self.oled.height), outline=0, fill=0)
+            # doorLockStatusString = self.doorLock.getStatusString()
+            # for i in range(len(doorLockStatusString)):
+            #     self.draw.text((0, 16*i), doorLockStatusString[i], font=self.font, fill=255)
+            # self.oled.image(self.image)
+            # self.oled.show()
+            # time.sleep(self.LOOPTIME)
 
 
 
