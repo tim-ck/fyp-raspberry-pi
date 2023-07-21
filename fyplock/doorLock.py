@@ -93,6 +93,7 @@ class DoorLock:
         # print("Setting up NFC reader...")
         self.PN532_I2C = Pn532I2c(1)
         self.nfc = Pn532(self.PN532_I2C)
+        time.sleep(0.5)
         self.nfc.begin()
         versiondata = self.nfc.getFirmwareVersion()
         if not versiondata:
@@ -108,8 +109,8 @@ class DoorLock:
         self.nfc_thread.start()
 
     def restartNfcReader(self):
-        print("Restarting NFC reader...")
-        time.sleep(1)
+        print("The NFC Reader have no respown!, please restart the NFC Reader")
+        pass
 
 
     def reset_door_lock_status(self):
