@@ -17,10 +17,8 @@ def clear_screen():
 class Display:
     def __init__(self, doorLock):
         print("Starting OLED display...")
-        thread = threading.Thread(target=self.display_loop)
-        thread.start()
         # clear
-        # self.doorLock = doorLock
+        self.doorLock = doorLock
         # self.oled_reset = digitalio.DigitalInOut(board.D4)
         # self.WIDTH = 128
         # self.HEIGHT = 64
@@ -38,8 +36,8 @@ class Display:
         # self.draw.text((self.BORDER, self.BORDER), "Door Lock System", font=self.font, fill=255)
         # self.oled.image(self.image)
         # self.oled.show()
-        # thread = threading.Thread(target=self.display_loop)
-        # thread.start()
+        thread = threading.Thread(target=self.display_loop)
+        thread.start()
     def display_loop(self):
         while True:
             clear_screen()
